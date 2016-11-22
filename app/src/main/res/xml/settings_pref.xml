@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Datenbank">
+        <CheckBoxPreference
+            android:key="extraForms"
+            android:title="Alle Stammformen aktivieren"
+            android:summary="Aktiviert alle Stammformen bei den Vokabeln der Lektion 1-22. (Änderung erst nach Neustart der App wirksam)"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Abfrage">
+        <ListPreference
+            android:key="proveInput"
+            android:title="Abfrage Modus"
+            android:summary=""
+            android:entryValues="@array/textModePrefVal"
+            android:entries="@array/textModePref"/>
+        <CheckBoxPreference
+            android:key="ignoreCase"
+            android:title="Groß- und Kleinschreibung ignorieren"
+            android:summary="Nur im Abfrage-Modus mit Texteingabe"
+            android:defaultValue="false"/>
+    </PreferenceCategory>
+</PreferenceScreen>
