@@ -28,7 +28,7 @@ import com.google.android.gms.ads.InterstitialAd;
 
 public class DisplayLektion extends AppCompatActivity {
 
-    private final String COPY_MESSAGE = "Hol dir die Cursus A App im Playstore!\nbit.ly/CursusA-App\n\n";
+    private final String COPY_MESSAGE = "Hol dir die Cursus A App im Playstore :D\nbit.ly/CursusA-App\n\n";
     private TextView text;
     private InterstitialAd mInterstitialAd;
     private AdView mAdView;

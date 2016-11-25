@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ds.dataTimeStamp = sharedPreferences.getLong(DATA_TIMESTAMP, 0);
         }
 
-        Log.d(ds.LOG_TAG, "Werbung entfernen: " + Boolean.toString(ds.removeAds));
+        Log.d(ds.LOG_TAG, "Remove Ads: " + Boolean.toString(ds.removeAds));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -418,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onClick(View v) {
         if(v == sendEntryButton) {
             Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:js-labs@web.de"));
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Latein Lösungen: Beitrag von " + nameEditText.getText() + " Erwähnen: " + erwähnenCheckBox.isChecked());
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Latein Cursus A: Beitrag von " + nameEditText.getText() + " Erwähnen: " + erwähnenCheckBox.isChecked());
             emailIntent.putExtra(Intent.EXTRA_TEXT, inhaltEditText.getText());
 
             startActivity(Intent.createChooser(emailIntent, "Email senden mit..."));

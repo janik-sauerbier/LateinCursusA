@@ -122,7 +122,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
             }
         });
-        String [] array = {"Alle Vokabeln der Lektion" ,"Alle eben abgefragten Vokabeln" ,"Nur nicht gewussten Vokabeln"};
+        String [] array = {"Alle Vokabeln der Lektion" ,"Alle eben abgefragten Vokabeln" ,"Nur nicht gewusste Vokabeln"};
         alertBuilder.setSingleChoiceItems(array, 0, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
