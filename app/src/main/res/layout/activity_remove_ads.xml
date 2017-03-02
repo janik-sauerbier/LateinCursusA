@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:paddingRight="16dp"
         android:paddingLeft="16dp"
-        android:text="Umfragen entfernen"
+        android:text="Werbung entfernen"
         android:textColor="#ffffff"
         android:background="@color/colorButton"
         android:id="@+id/buttonBuy"

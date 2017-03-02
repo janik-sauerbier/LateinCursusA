@@ -25,7 +25,7 @@
         <CheckBoxPreference
             android:key="surveyMode"
             android:title="Pollfish Umfragen aktivieren"
-            android:summary="Du kannst um die Werbung zu deaktivieren ca. 1 mal pro Tag (sofern du die App nutzt) an einer Umfrage teilnehmen."
+            android:summary="Du kannst um die Werbung zu deaktivieren stattdessen hin und wieder an einer Umfrage teilnehmen."
             android:defaultValue="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -35,7 +35,7 @@ public class RemoveAds extends AppCompatActivity implements Button.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remove_ads);
 
-        getSupportActionBar().setTitle("Umfragen entfernen");
+        getSupportActionBar().setTitle("Werbung entfernen");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ds = DataStorage.getInstance();
@@ -88,7 +88,7 @@ public class RemoveAds extends AppCompatActivity implements Button.OnClickListen
             Log.d(ds.LOG_TAG, "removeAds = " + Boolean.toString(ds.removeAds));
             Snackbar.make(removeAdsContent, "Debug Kauf wurde rückgängig gemacht", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-            removeAdsBtn.setText("Umfragen entfernen");
+            removeAdsBtn.setText("Werbung entfernen");
         }else {
             ds.removeAds = true;
             Log.d(ds.LOG_TAG, "removeAds = " + Boolean.toString(ds.removeAds));
@@ -108,7 +108,7 @@ public class RemoveAds extends AppCompatActivity implements Button.OnClickListen
             if (result.isFailure()) {
 
                 removeAdsBtn.setEnabled(true);
-                removeAdsBtn.setText("Umfragen entfernen");
+                removeAdsBtn.setText("Werbung entfernen");
 
                 if(result.getResponse() == 7){
                     Log.d(ds.LOG_TAG, "Kauf wird wieder hergestellt...");

@@ -52,6 +52,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             doProvePref.setValue("1");
             ignoreCasePref.setEnabled(false);
         }
+        if(!ds.cursus_surveys){
+            surveyModePref.setEnabled(false);
+        }
     }
 
     @Override
@@ -92,7 +95,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
         sharedDataEditor.putBoolean(MainActivity.IGNORE_CASE, sharedPreferencesInput.getBoolean(MainActivity.IGNORE_CASE, true));
         ds.ignoreCase = sharedPreferencesInput.getBoolean(MainActivity.IGNORE_CASE, true);
-        ds.surveyMode = sharedPreferencesInput.getBoolean(MainActivity.SURVEY_MODE, true);
+        if(ds.cursus_surveys)
+            ds.surveyMode = sharedPreferencesInput.getBoolean(MainActivity.SURVEY_MODE, true);
         sharedDataEditor.commit();
     }
 }

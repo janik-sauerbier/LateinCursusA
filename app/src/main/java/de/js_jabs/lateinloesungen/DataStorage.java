@@ -17,6 +17,7 @@ public class DataStorage {
     public boolean devMode;
     public boolean surveyMode;
     public boolean firstStartSurveys;
+    public boolean cursus_surveys;
     public boolean extraForms;
     public boolean proveInput;
     public boolean ignoreCase;
