@@ -141,7 +141,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
             justRightBtn.setOnClickListener(this);
             proveBtn.setOnClickListener(this);
 
-            if(ds.removeAds == true){
+            if(ds.removeAds || ds.surveyMode){
                 Log.d(ds.LOG_TAG, "Werbung wird nicht angezeigt");
             }else {
                 Log.d(ds.LOG_TAG, "Werbung wird angezeigt");
@@ -212,7 +212,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
             rightBtn.setOnClickListener(this);
             wrongBtn.setOnClickListener(this);
 
-            if(ds.removeAds == true){
+            if(ds.removeAds || ds.surveyMode){
                 Log.d(ds.LOG_TAG, "Werbung wird nicht angezeigt");
             }else {
                 Log.d(ds.LOG_TAG, "Werbung wird angezeigt");
@@ -292,16 +292,14 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
     }
 
     public void showAd(){
-        if(ds.removeAds == false){
+        if(ds.removeAds || ds.surveyMode){
+            closeAd();
+        } else {
             if (mInterstitialAd.isLoaded()) {
                 mInterstitialAd.show();
             } else {
-                if(closeActivityAfterAd)
-                    finish();
+                closeAd();
             }
-        }else {
-            if(closeActivityAfterAd)
-                finish();
         }
     }
 

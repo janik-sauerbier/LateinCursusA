@@ -19,6 +19,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     private ListPreference doProvePref;
     private CheckBoxPreference ignoreCasePref;
+    private CheckBoxPreference surveyModePref;
 
     private DataStorage ds;
 
@@ -39,9 +40,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         sharedInputEditor = sharedPreferencesInput.edit();
 
         sharedInputEditor.putBoolean(MainActivity.EXTRA_FORMS, sharedPreferencesData.getBoolean(MainActivity.EXTRA_FORMS, false));
+        sharedInputEditor.putBoolean(MainActivity.SURVEY_MODE, sharedPreferencesData.getBoolean(MainActivity.SURVEY_MODE, true));
         doProvePref = (ListPreference) findPreference(MainActivity.PROVE_INPUT);
         doProvePref.setOnPreferenceChangeListener(this);
         ignoreCasePref = (CheckBoxPreference) findPreference(MainActivity.IGNORE_CASE);
+        surveyModePref = (CheckBoxPreference) findPreference(MainActivity.SURVEY_MODE);
+        surveyModePref.setChecked(sharedPreferencesData.getBoolean(MainActivity.SURVEY_MODE, true));
         if(sharedPreferencesData.getBoolean(MainActivity.PROVE_INPUT, false)){
             doProvePref.setValue("2");
         }else{
@@ -64,7 +68,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        System.out.println(newValue);
+
         if(newValue.equals("1")){
             ignoreCasePref.setEnabled(false);
         }else {
@@ -78,7 +82,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public void onStop(){
         super.onStop();
         sharedDataEditor.putBoolean(MainActivity.EXTRA_FORMS, sharedPreferencesInput.getBoolean(MainActivity.EXTRA_FORMS, false));
-        System.out.println(doProvePref.getValue());
+        sharedDataEditor.putBoolean(MainActivity.SURVEY_MODE, sharedPreferencesInput.getBoolean(MainActivity.SURVEY_MODE, true));
         if(doProvePref.getValue().equals("1")){
             sharedDataEditor.putBoolean(MainActivity.PROVE_INPUT, false);
             ds.proveInput = false;
@@ -88,6 +92,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
         sharedDataEditor.putBoolean(MainActivity.IGNORE_CASE, sharedPreferencesInput.getBoolean(MainActivity.IGNORE_CASE, true));
         ds.ignoreCase = sharedPreferencesInput.getBoolean(MainActivity.IGNORE_CASE, true);
+        ds.surveyMode = sharedPreferencesInput.getBoolean(MainActivity.SURVEY_MODE, true);
         sharedDataEditor.commit();
     }
 }
