@@ -246,6 +246,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         firebaseRemoteConfig.fetch(14400);
 
         ds.cursus_surveys = firebaseRemoteConfig.getBoolean("cursus_surveys");
+
+        if(ds.devMode){
+            ds.cursus_surveys = true;
+        }
+
         Log.d("Pollfish", "cursus_surveys: " + ds.cursus_surveys);
 
         if(ds.cursus_surveys){
@@ -444,13 +449,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
         if(buttonView == erwähnenCheckBox){
-            if(ds.devMode == false){
-                devCounter++;
-                if(devCounter > 20){
-                    ds.devMode = true;
-                    sharedEditor.putBoolean(DEV_MODE, true);
+            devCounter++;
+            if(devCounter > 20){
+                if(ds.devMode){
+                    ds.devMode = false;
+                    sharedEditor.putBoolean(DEV_MODE, ds.devMode);
                     sharedEditor.apply();
+                    Toast.makeText(this, "Dev-Modus deaktiviert", Toast.LENGTH_SHORT).show();
+                }else {
+                    ds.devMode = true;
+                    sharedEditor.putBoolean(DEV_MODE, ds.devMode);
+                    sharedEditor.apply();
+                    Toast.makeText(this, "Dev-Modus aktiviert", Toast.LENGTH_SHORT).show();
                 }
+                devCounter = 0;
             }
         }
     }
