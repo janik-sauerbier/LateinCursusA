@@ -241,13 +241,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build();
-        firebaseRemoteConfig.setConfigSettings(configSettings);
         firebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
         firebaseRemoteConfig.activateFetched();
-        firebaseRemoteConfig.fetch(0);
+        firebaseRemoteConfig.fetch(14400);
 
         ds.cursus_surveys = firebaseRemoteConfig.getBoolean("cursus_surveys");
         Log.d("Pollfish", "cursus_surveys: " + ds.cursus_surveys);
