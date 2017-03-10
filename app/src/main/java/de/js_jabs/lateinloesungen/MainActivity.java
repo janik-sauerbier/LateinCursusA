@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.util.DisplayMetrics;
@@ -39,7 +41,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
@@ -78,12 +79,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String PROVE_INPUT = "proveInput";
     public static final String IGNORE_CASE = "ignoreCase";
     public static final String DEV_MODE = "devMode";
-    public static final String SURVEY_MODE = "surveyMode";
-    public static final String SURVEY_FIRST_START = "surveyFirstStart";
+    public static final String SURVEY_REMOVE_ADS = "surveyRemoveAds";
+    public static final String SURVEY_TIMESTAMP = "surveyTimeStamp";
     public static final String DATA_TIMESTAMP = "dataTimeStamp";
     public static final String DATA_FORMS_TIMESTAMP = "dataFormsTimeStamp";
 
     public static final String ANALYTICS_REMOVED_ADS = "removed_ads";
+    public static final String ANALYTICS_SURVEY_REMOVED_ADS = "survey_removed_ads";
     public static final String ANALYTICS_TYPE_TEST_VOC = "Test Voc";
     public static final String ANALYTICS_TYPE_SHOW_VOC = "Show Voc";
     public static final String ANALYTICS_TYPE_SHOW_LEKTION = "Show Lektion";
@@ -99,9 +101,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public View contentSend;
     public View contentHome;
     public View contentRightsInfo;
+    public FloatingActionButton surveyTimerFab;
     public NavigationView navigationView;
     public StableArrayAdapter adapterListView;
     private AlertDialog.Builder alertBuilder;
+    private AlertDialog surveyDialogBuilder;
 
     public SharedPreferences sharedPreferences;
     public SharedPreferences.Editor sharedEditor;
@@ -127,6 +131,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Home");
 
+        setupDataStorage();
+
+        setupNavigation();
+
+        setupHomeMenu();
+
+        if(ds.firstStart){
+            loadDataFile();
+            ds.firstStart = false;
+        }
+
+        setupFirebase();
+
+        setupPollfish();
+
+        checkDatabase();
+    }
+
+    private void setupDataStorage(){
         ds = DataStorage.getInstance();
 
         sharedPreferences = this.getSharedPreferences(SHARED_PREF, 0);
@@ -138,9 +161,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ds.proveInput = sharedPreferences.getBoolean(PROVE_INPUT, false);
         ds.ignoreCase = sharedPreferences.getBoolean(IGNORE_CASE, true);
         ds.devMode = sharedPreferences.getBoolean(DEV_MODE, false);
-        ds.surveyMode = sharedPreferences.getBoolean(SURVEY_MODE, true);
-        ds.firstStartSurveys = sharedPreferences.getBoolean(SURVEY_FIRST_START, true);
+        ds.surveyTimeStamp = sharedPreferences.getLong(SURVEY_TIMESTAMP, 0);
 
+        ds.testVocBuffer = new ArrayList<Vokablel>();
+        for(int i = 1; i < 51; i++){
+            ds.lektions[i - 1] = new Lektion(i);
+        }
 
         if(ds.extraForms){
             ds.dataTimeStamp = sharedPreferences.getLong(DATA_FORMS_TIMESTAMP, 0);
@@ -149,7 +175,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         Log.d(ds.LOG_TAG, "Remove Ads: " + Boolean.toString(ds.removeAds));
+        Log.d(ds.LOG_TAG, "Survey Remove Ads: " + Boolean.toString(ds.surveyRemoveAds) + " / Timestamp: " + ds.surveyTimeStamp);
+    }
 
+    private void setupNavigation(){
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -162,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(ds.removeAds){
             navigationView.getMenu().removeItem(R.id.nav_remove_ads);
-            Log.d(ds.LOG_TAG, "Remove 'Umfragen entfernen' in the Menu");
+            Log.d(ds.LOG_TAG, "Remove 'Werbung entfernen' in the Menu");
         }
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -171,7 +200,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         contentHome = inflater.inflate(R.layout.content_home_main, (ViewGroup) findViewById(R.id.contentHomeRl));
         contentRightsInfo = inflater.inflate(R.layout.content_rightsinfo_main, (ViewGroup) findViewById(R.id.contentRightsInfoRl));
         appBarMain.addView(contentHome);
+    }
 
+    private void setupHomeMenu(){
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.letionen, R.layout.spinner_item);
@@ -197,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         });
 
-        ds.testVocBuffer = new ArrayList<Vokablel>();
+
         alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setTitle("Wähle die Vokabeln");
         alertBuilder.setPositiveButton("Starten", new DialogInterface.OnClickListener() {
@@ -218,18 +249,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        if(ds.firstStart){
-            for(int i = 1; i < 51; i++){
-                ds.lektions[i - 1] = new Lektion(i);
-            }
+        surveyTimerFab = (FloatingActionButton) findViewById(R.id.fab_survey_timer);
+        surveyTimerFab.setOnClickListener(this);
+    }
 
-            loadDataFile();
-
-            ds.firstStart = false;
-        }
-
+    private void setupFirebase(){
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         firebaseAnalytics.setUserProperty(ANALYTICS_REMOVED_ADS, Boolean.toString(ds.removeAds));
+        firebaseAnalytics.setUserProperty(ANALYTICS_SURVEY_REMOVED_ADS, Boolean.toString(ds.surveyRemoveAds));
         firebaseAnalytics.setAnalyticsCollectionEnabled(!ds.devMode);
 
         firebaseStorage = FirebaseStorage.getInstance();
@@ -252,13 +279,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         Log.d("Pollfish", "cursus_surveys: " + ds.cursus_surveys);
+    }
 
+    private void setupPollfish(){
         if(ds.cursus_surveys){
             PFparamsBuilder = new ParamsBuilder("79a97698-aa4f-4a68-a2b4-2c0a0bc07198")
                     .pollfishClosedListener(new PollfishClosedListener() {
                         @Override
                         public void onPollfishClosed(){
-                            if(!PollFish.isPollfishPresent() && !ds.userCanPass){
+                            if(!PollFish.isPollfishPresent()){
                                 PollFish.initWith(MainActivity.this, PFparamsBuilder);
                                 PollFish.hide();
                             }
@@ -267,22 +296,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         @Override
                         public void onPollfishSurveyNotAvailable(){
                             Log.d("Pollfish", "Survey Not Available!");
-                            ds.userCanPass = true;
+                            ds.received_survey = false;
                         }
                     }).pollfishUserNotEligibleListener(new PollfishUserNotEligibleListener() {
                         @Override
                         public void onUserNotEligible(){
+                            Bundle bundle = new Bundle();
+                            firebaseAnalytics.logEvent("user_not_eligible", bundle);
+
                             Log.d("Pollfish", "User Not Eligible!");
-                            ds.userIsEligible = false;
-                            ds.userCanPass = true;
+                            ds.received_survey = false;
+                            if(ds.surveyTimeStamp < System.currentTimeMillis()){
+                                ds.surveyTimeStamp = System.currentTimeMillis() + 20 * 3600000;
+                            }else {
+                                ds.surveyTimeStamp = ds.surveyTimeStamp + 20 * 3600000;
+                            }
                             PollFish.hide();
                             Toast.makeText(MainActivity.this, "Du bist leider nicht teilnahmeberechtigt. Trotzdem Danke :D", Toast.LENGTH_SHORT).show();
+                            sharedEditor.putLong(SURVEY_TIMESTAMP, ds.surveyTimeStamp);
+                            sharedEditor.commit();
+                            testSurveyTimestamp();
                         }
                     }).pollfishSurveyReceivedListener(new PollfishSurveyReceivedListener() {
                         @Override
                         public void onPollfishSurveyReceived(final boolean playfulSurvey, final int surveyPrice) {
+                            double surveyPriceDC = surveyPrice;
+                            surveyPriceDC = surveyPriceDC / 100;
+
+                            Bundle bundle = new Bundle();
+                            bundle.putString(FirebaseAnalytics.Param.VALUE, Double.toString(surveyPriceDC));
+                            bundle.putString(FirebaseAnalytics.Param.CURRENCY, "USD");
+                            firebaseAnalytics.logEvent("received_survey", bundle);
+
                             Log.d("Pollfish", "Survey Received!");
-                            ds.userCanPass = false;
+                            ds.currentSurveyPrice = surveyPrice;
+                            ds.received_survey = true;
                         }
                     }).pollfishSurveyCompletedListener(new PollfishSurveyCompletedListener() {
                         @Override
@@ -296,47 +344,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             firebaseAnalytics.logEvent(FirebaseAnalytics.Event.ECOMMERCE_PURCHASE, bundle);
 
                             Log.d("Pollfish", "Survey Completed! Playful: " + playfulSurvey + " / Price: " + surveyPriceDC + " USD");
-                            ds.userCanPass = true;
+                            ds.received_survey = false;
+                            if(ds.surveyTimeStamp < System.currentTimeMillis()){
+                                ds.surveyTimeStamp = System.currentTimeMillis() + (surveyPrice + 20) * 3600000;
+                            }else {
+                                ds.surveyTimeStamp = ds.surveyTimeStamp + (surveyPrice + 20) * 3600000;
+                            }
+                            sharedEditor.putLong(SURVEY_TIMESTAMP, ds.surveyTimeStamp);
+                            sharedEditor.commit();
+                            testSurveyTimestamp();
                         }
                     }).customMode(true).releaseMode(!ds.devMode).build();
 
             PollFish.initWith(this, PFparamsBuilder);
             PollFish.hide();
         } else {
-            ds.userCanPass = true;
-            ds.surveyMode = false;
+            ds.received_survey = false;
+            ds.surveyRemoveAds = false;
         }
 
-        if(ds.firstStartSurveys && ds.cursus_surveys){
-            if(!ds.removeAds){
-                Bundle bundle = new Bundle();
-                firebaseAnalytics.logEvent("surveys_first_start", bundle);
+        testSurveyTimestamp();
+    }
 
-                new AlertDialog.Builder(this)
-                        .setTitle("Update")
-                        .setMessage(Html.fromHtml("Es werden testweise <B>keine Werbeanzeigen</B> mehr geschaltet. <br/><br/>Stattdessen gibt es nun hin und wieder eine kurze Umfrage, die man ausfüllen muss. Dadurch wird man beim Lernen weniger durch Werbung abgelenkt und man ist bis zu <B>20x weniger</B> mit nicht schulischen Inhalten beschäftigt<br/><br/>(In den Einstellungen kann man die Umfragen deaktivieren und zu den Werbeanzeigen zurückkehren)"))
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
+    private void showSurveyDialog(int price){
+        surveyDialogBuilder = new AlertDialog.Builder(this)
+                .setTitle("Neue Umfrage")
+                .setMessage(Html.fromHtml("Nimm an einer kurzen Umfrage teil und <B>entferne die Werbung</B> für (weitere): <br/><br/><h1>" + (price + 20) + " Stunden</h1><B>Hinweis:</B> Solltest du aufgrund deiner Anworten nicht teilnahmeberechtigt sein wird die Werbung nur für 20 Stunden entfernt. Außerdem hast du die Chance einen kleinen <B>Preis</B> zu gewinnen!"))
+                .setPositiveButton("Teilnehmen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(PollFish.isPollfishPresent()){
+                            PollFish.show();
+                        }else {
+                            PollFish.initWith(MainActivity.this, PFparamsBuilder);
+                        }
+                    }
+                })
+                .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        surveyDialogBuilder.cancel();
+                        ds.received_survey = false;
+                    }
+                })
+                .setCancelable(false)
+                .setIcon(R.drawable.ic_info)
+                .show();
+    }
 
-                            }
-                        })
-                        .setNegativeButton("Nicht erneut zeigen", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                sharedEditor.putBoolean(SURVEY_FIRST_START, false);
-                                sharedEditor.commit();
-                            }
-                        })
-                        .setIcon(R.drawable.ic_info)
-                        .show();
-            } else{
-                sharedEditor.putBoolean(SURVEY_FIRST_START, false);
-                sharedEditor.commit();
-            }
+    private void testSurveyTimestamp(){
+        if(ds.surveyTimeStamp < System.currentTimeMillis()){
+            ds.surveyRemoveAds = false;
+            surveyTimerFab.setVisibility(View.INVISIBLE);
+        } else {
+            ds.surveyRemoveAds = true;
+            surveyTimerFab.setVisibility(View.VISIBLE);
+            Snackbar.make(surveyTimerFab, "Werbung für " + ((ds.surveyTimeStamp - System.currentTimeMillis()) / 3600000 + 1) + " Stunden entfernt.", Snackbar.LENGTH_LONG).show();
         }
-
-        checkDatabase();
     }
 
     @Override
@@ -362,6 +426,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
     }
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //                            HOME MENU/NAVIGATION
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -437,6 +505,73 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    public void listViewAction(int id){
+        if(id == 0){
+            if(isDataLoaded()){
+                if(!ds.received_survey || ds.removeAds){
+                    Intent i = new Intent(this, DisplayLektion.class);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Integer.toString(ds.currentLektion+1));
+                    bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, ANALYTICS_TYPE_SHOW_LEKTION);
+                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
+                    startActivity(i);
+                }else{
+                    showSurveyDialog(ds.currentSurveyPrice);
+                }
+            }
+        }else if(id == 1){
+            if(isDataLoaded()){
+                if(!ds.received_survey || ds.removeAds){
+                    loadVocToDialog();
+                    AlertDialog dialog = alertBuilder.create();
+                    dialog.show();
+                }else{
+                    showSurveyDialog(ds.currentSurveyPrice);
+                }
+            }
+        }else if(id == 2){
+            if(isDataLoaded()){
+                if(!ds.received_survey || ds.removeAds){
+                    Intent i = new Intent(this, DisplayVoc.class);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Integer.toString(ds.currentLektion+1));
+                    bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, ANALYTICS_TYPE_SHOW_VOC);
+                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
+                    startActivity(i);
+                }else{
+                    showSurveyDialog(ds.currentSurveyPrice);
+                }
+            }
+        } else if (id == 3) {
+            if(ds.dataIsLeast == false){
+                startUpdateData();
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "update database");
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, ANALYTICS_TYPE_MENU_ACTION);
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+            }
+        }else if(id == 4){
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "rate app");
+            bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, ANALYTICS_TYPE_MENU_ACTION);
+            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=de.js_jabs.lateinloesungen")));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=de.js_jabs.lateinloesungen")));
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //                            BUTTON LISTENER
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if(buttonView == nutzungsbedingungenCheckBox){
@@ -467,6 +602,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        if(v == sendEntryButton) {
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:js-labs@web.de"));
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Latein Cursus A: Beitrag von " + nameEditText.getText() + " Erwähnen: " + erwähnenCheckBox.isChecked());
+            emailIntent.putExtra(Intent.EXTRA_TEXT, inhaltEditText.getText());
+
+            startActivity(Intent.createChooser(emailIntent, "Email senden mit..."));
+        }
+        if(v == surveyTimerFab){
+            testSurveyTimestamp();
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //                            LOADING DATA
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    private boolean isDataLoaded(){
+        if(ds.lektions != null ){
+            if(ds.lektions[ds.currentLektion].vokablels != null){
+                return true;
+            }else{
+                return false;
+            }
+        }else {
+            return false;
+        }
+    }
+
     public void loadVocToDialog(){
         ds.testVocBuffer.clear();
         for(int i = 0; i < ds.lektions[ds.currentLektion].vokablels.length; i++){
@@ -491,93 +656,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-    }
-
-    public void listViewAction(int id){
-        if(id == 0){
-            if(isDataLoaded()){
-                if(ds.userCanPass || !ds.surveyMode || ds.removeAds){
-                    Intent i = new Intent(this, DisplayLektion.class);
-
-                    Bundle bundle = new Bundle();
-                    bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Integer.toString(ds.currentLektion+1));
-                    bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, ANALYTICS_TYPE_SHOW_LEKTION);
-                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
-                    startActivity(i);
-                }else{
-                    Log.d("Pollfish", "SurveyMode: " + ds.surveyMode);
-                    PollFish.show();
-                }
-            }
-        }else if(id == 1){
-            if(isDataLoaded()){
-                if(ds.userCanPass || !ds.surveyMode || ds.removeAds){
-                    loadVocToDialog();
-                    AlertDialog dialog = alertBuilder.create();
-                    dialog.show();
-                }else{
-                    PollFish.show();
-                }
-            }
-        }else if(id == 2){
-            if(isDataLoaded()){
-                if(ds.userCanPass || !ds.surveyMode || ds.removeAds){
-                    Intent i = new Intent(this, DisplayVoc.class);
-
-                    Bundle bundle = new Bundle();
-                    bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Integer.toString(ds.currentLektion+1));
-                    bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, ANALYTICS_TYPE_SHOW_VOC);
-                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
-                    startActivity(i);
-                }else{
-                    PollFish.show();
-                }
-            }
-        } else if (id == 3) {
-            if(ds.dataIsLeast == false){
-                startUpdateData();
-                Bundle bundle = new Bundle();
-                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "update database");
-                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, ANALYTICS_TYPE_MENU_ACTION);
-                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-            }
-        }else if(id == 4){
-            Bundle bundle = new Bundle();
-            bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "rate app");
-            bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, ANALYTICS_TYPE_MENU_ACTION);
-            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=de.js_jabs.lateinloesungen")));
-            } catch (android.content.ActivityNotFoundException anfe) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=de.js_jabs.lateinloesungen")));
-            }
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        if(v == sendEntryButton) {
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:js-labs@web.de"));
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Latein Cursus A: Beitrag von " + nameEditText.getText() + " Erwähnen: " + erwähnenCheckBox.isChecked());
-            emailIntent.putExtra(Intent.EXTRA_TEXT, inhaltEditText.getText());
-
-            startActivity(Intent.createChooser(emailIntent, "Email senden mit..."));
-        }
-    }
-
-    private boolean isDataLoaded(){
-        if(ds.lektions != null ){
-            if(ds.lektions[ds.currentLektion].vokablels != null){
-                return true;
-            }else{
-                return false;
-            }
-        }else {
-            return false;
-        }
     }
 
     public void loadDataFile(){
@@ -696,6 +774,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //                            ONLINE DATABASE
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     private void checkDatabase(){
         databaseRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
             @Override
@@ -791,6 +873,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
     }
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //                            SPINNER
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

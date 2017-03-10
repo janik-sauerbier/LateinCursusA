@@ -66,7 +66,7 @@ public class DisplayVoc extends AppCompatActivity {
             addVoc(vokablel);
         }
 
-        if(ds.removeAds || ds.surveyMode){
+        if(ds.removeAds || ds.surveyRemoveAds){
             Log.d(ds.LOG_TAG, "Werbung wird nicht angezeigt");
         }else {
             Log.d(ds.LOG_TAG, "Werbung wird angezeigt");
@@ -170,7 +170,7 @@ public class DisplayVoc extends AppCompatActivity {
     }
 
     public void showAd(){
-        if(ds.removeAds || ds.surveyMode){
+        if(ds.removeAds || ds.surveyRemoveAds){
             finish();
         } else {
             if (mInterstitialAd.isLoaded()) {

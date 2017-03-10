@@ -62,7 +62,7 @@ public class DisplayLektion extends AppCompatActivity {
 
         contentDisplayLektion = (RelativeLayout)findViewById(R.id.contentDisplayLektionRl);
 
-        if(ds.removeAds || ds.surveyMode){
+        if(ds.removeAds || ds.surveyRemoveAds){
             Log.d(ds.LOG_TAG, "Werbung wird nicht angezeigt");
         }else {
             Log.d(ds.LOG_TAG, "Werbung wird angezeigt");
@@ -152,7 +152,7 @@ public class DisplayLektion extends AppCompatActivity {
     }
 
     public void showAd(){
-        if(ds.removeAds || ds.surveyMode){
+        if(ds.removeAds || ds.surveyRemoveAds){
             finish();
         } else {
             if (mInterstitialAd.isLoaded()) {
