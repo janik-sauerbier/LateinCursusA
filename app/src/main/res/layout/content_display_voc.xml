@@ -40,7 +40,7 @@
                     android:layout_height="match_parent"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="Latein"
-                    android:background="@drawable/lektion_selection_bg"
+                    android:background="@drawable/primary_bg_color"
                     android:textColor="#FFFFFF"
                     android:layout_weight="4"
                     android:id="@+id/textView5" />
@@ -52,7 +52,7 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="Formen/Übersetzung"
                     android:textColor="#FFFFFF"
-                    android:background="@drawable/lektion_selection_bg"
+                    android:background="@drawable/primary_bg_color"
                     android:id="@+id/textView6"
                     android:layout_weight="6" />
 

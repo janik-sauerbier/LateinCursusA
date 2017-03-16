@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="Latein"
         android:textColor="@color/colorWhite"
-        android:background="@drawable/lektion_selection_bg"
+        android:background="@drawable/primary_bg_color"
         android:textSize="25dp"
         android:id="@+id/textViewTestVocLateinTitleP" />
 
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:text="Deutsch / Formen"
         android:textColor="@color/colorWhite"
-        android:background="@drawable/lektion_selection_bg"
+        android:background="@color/colorPrimary"
         android:textSize="25dp"
         android:id="@+id/textViewTestVocDeutschTitleP"
         android:layout_above="@+id/editTextTestVocInput"/>
@@ -93,5 +93,16 @@
         android:textColor="@color/colorWhite"
         android:background="#00A827"
         android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/adSizeIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text=""
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textViewTestVocLateinTitleP"
+        android:layout_alignBottom="@+id/buttonTestVocProve"
+        android:layout_marginBottom="14dp"/>
 
 </RelativeLayout>

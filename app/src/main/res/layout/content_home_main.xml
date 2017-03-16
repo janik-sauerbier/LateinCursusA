@@ -13,7 +13,7 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/lektion_selection_bg"
+        android:background="@color/colorPrimary"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:id="@+id/spinner"
@@ -38,7 +38,7 @@
         android:paddingBottom="16dp"
         android:paddingTop="30dp"
         android:textSize="20dp"
-        android:background="@drawable/lektion_selection_bg"
+        android:background="@color/colorPrimary"
         android:id="@+id/textView9"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"

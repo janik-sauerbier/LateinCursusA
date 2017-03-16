@@ -256,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setupFirebase(){
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         firebaseAnalytics.setUserProperty(ANALYTICS_REMOVED_ADS, Boolean.toString(ds.removeAds));
-        firebaseAnalytics.setUserProperty(ANALYTICS_SURVEY_REMOVED_ADS, Boolean.toString(ds.surveyRemoveAds));
         firebaseAnalytics.setAnalyticsCollectionEnabled(!ds.devMode);
 
         firebaseStorage = FirebaseStorage.getInstance();
@@ -312,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 ds.surveyTimeStamp = ds.surveyTimeStamp + 20 * 3600000;
                             }
                             PollFish.hide();
-                            Toast.makeText(MainActivity.this, "Du bist leider nicht teilnahmeberechtigt. Trotzdem Danke :D", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Du bist leider nicht teilnahmeberechtigt. Deshalb erhälst du nur 20 Stunden keine werbung. Trotzdem Danke :D", Toast.LENGTH_SHORT).show();
                             sharedEditor.putLong(SURVEY_TIMESTAMP, ds.surveyTimeStamp);
                             sharedEditor.commit();
                             testSurveyTimestamp();
@@ -369,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void showSurveyDialog(int price){
         surveyDialogBuilder = new AlertDialog.Builder(this)
                 .setTitle("Neue Umfrage")
-                .setMessage(Html.fromHtml("Nimm an einer kurzen Umfrage teil und <B>entferne die Werbung</B> für (weitere): <br/><br/><h1>" + (price + 20) + " Stunden</h1><B>Hinweis:</B> Solltest du aufgrund deiner Anworten nicht teilnahmeberechtigt sein wird die Werbung nur für 20 Stunden entfernt. Außerdem hast du die Chance einen kleinen <B>Preis</B> zu gewinnen!"))
+                .setMessage(Html.fromHtml("Nimm an einer kurzen Umfrage teil und <B>entferne die Werbung</B> für (weitere): <br/><br/><h1>" + (price + 20) + " Stunden</h1><B>Hinweis:</B> Solltest du aufgrund deiner Anworten nicht teilnahmeberechtigt sein wird die Werbung nicht entfernt. Außerdem hast du die Chance einen kleinen <B>Preis</B> zu gewinnen!"))
                 .setPositiveButton("Teilnehmen", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -395,9 +394,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void testSurveyTimestamp(){
         if(ds.surveyTimeStamp < System.currentTimeMillis()){
             ds.surveyRemoveAds = false;
+            firebaseAnalytics.setUserProperty(ANALYTICS_SURVEY_REMOVED_ADS, Boolean.toString(ds.surveyRemoveAds));
             surveyTimerFab.setVisibility(View.INVISIBLE);
         } else {
             ds.surveyRemoveAds = true;
+            firebaseAnalytics.setUserProperty(ANALYTICS_SURVEY_REMOVED_ADS, Boolean.toString(ds.surveyRemoveAds));
             surveyTimerFab.setVisibility(View.VISIBLE);
             Snackbar.make(surveyTimerFab, "Werbung für " + ((ds.surveyTimeStamp - System.currentTimeMillis()) / 3600000 + 1) + " Stunden entfernt.", Snackbar.LENGTH_LONG).show();
         }
@@ -508,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void listViewAction(int id){
         if(id == 0){
             if(isDataLoaded()){
-                if(!ds.received_survey || ds.removeAds){
+                if(!PollFish.isPollfishPresent() || !ds.received_survey || ds.removeAds){
                     Intent i = new Intent(this, DisplayLektion.class);
 
                     Bundle bundle = new Bundle();
@@ -523,7 +524,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }else if(id == 1){
             if(isDataLoaded()){
-                if(!ds.received_survey || ds.removeAds){
+                if(!PollFish.isPollfishPresent() || !ds.received_survey || ds.removeAds){
                     loadVocToDialog();
                     AlertDialog dialog = alertBuilder.create();
                     dialog.show();
@@ -533,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }else if(id == 2){
             if(isDataLoaded()){
-                if(!ds.received_survey || ds.removeAds){
+                if(!PollFish.isPollfishPresent() || !ds.received_survey || ds.removeAds){
                     Intent i = new Intent(this, DisplayVoc.class);
 
                     Bundle bundle = new Bundle();
