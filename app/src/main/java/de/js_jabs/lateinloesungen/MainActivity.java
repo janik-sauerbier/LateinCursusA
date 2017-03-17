@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setupHomeMenu();
 
-        if(ds.firstStart){
+        if(!isDataLoaded()){
             loadDataFile();
             ds.firstStart = false;
         }
@@ -411,6 +412,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             PollFish.initWith(this, PFparamsBuilder);
             PollFish.hide();
         }
+        if(!isDataLoaded()){
+            if(Build.VERSION.SDK_INT >= 11)
+                recreate();
+            else
+                finish();
+        }
     }
 
     @Override
@@ -521,6 +528,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else{
                     showSurveyDialog(ds.currentSurveyPrice);
                 }
+            }else {
+                if(Build.VERSION.SDK_INT >= 11)
+                    recreate();
+                else
+                    finish();
             }
         }else if(id == 1){
             if(isDataLoaded()){
@@ -531,6 +543,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else{
                     showSurveyDialog(ds.currentSurveyPrice);
                 }
+            }else {
+                if(Build.VERSION.SDK_INT >= 11)
+                    recreate();
+                else
+                    finish();
             }
         }else if(id == 2){
             if(isDataLoaded()){
@@ -546,9 +563,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else{
                     showSurveyDialog(ds.currentSurveyPrice);
                 }
+            }else {
+                if(Build.VERSION.SDK_INT >= 11)
+                    recreate();
+                else
+                    finish();
             }
         } else if (id == 3) {
-            if(ds.dataIsLeast == false){
+            if(!ds.dataIsLeast){
                 startUpdateData();
                 Bundle bundle = new Bundle();
                 bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "update database");
@@ -576,7 +598,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if(buttonView == nutzungsbedingungenCheckBox){
-            if(isChecked == true){
+            if(isChecked){
                 sendEntryButton.setEnabled(true);
                 sendEntryButton.setBackgroundColor(Color.parseColor("#FF4D00"));
             }else{

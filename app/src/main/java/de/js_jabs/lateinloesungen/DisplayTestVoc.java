@@ -235,8 +235,6 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
                             mNativAdView.setAdSize(new AdSize(AdSize.FULL_WIDTH, pxToDp(adSizeIndicator.getHeight()) - pxToDp(mAdView.getHeight())));
 
-                            Log.d("test", "mAdView = " + pxToDp(mAdView.getHeight()) + " / adSizeIndicator = " + pxToDp(adSizeIndicator.getHeight()));
-
                             AdRequest nativAdRequest = new AdRequest.Builder().build();
                             mNativAdView.loadAd(nativAdRequest);
                         }
