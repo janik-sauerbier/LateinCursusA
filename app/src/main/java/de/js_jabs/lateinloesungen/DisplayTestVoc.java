@@ -367,48 +367,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
     private void initProveTest(boolean clock){
         if(ds.testVocBuffer.size() == 0 && clock == true){
-            int right = 0;
-            int wrong = 0;
-            for(int i = 0; i< result.size(); i++){
-                if (result.get(i)){
-                    right++;
-                }else {
-                    wrong++;
-                }
-            }
-            setContentView(R.layout.activity_display_test_voc_result);
-
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            toolbar.setTitle("Ergebnisse");
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-            exit = (Button) findViewById(R.id.buttonTestVocExit);
-            exit.setOnClickListener(this);
-            again = (Button) findViewById(R.id.buttonTestVocAgain);
-            again.setOnClickListener(this);
-            TextView rightCount = (TextView) findViewById(R.id.textViewRightCount);
-            rightCount.setText(Integer.toString(right));
-            rightCount.setTextSize(20 + right * 2);
-            TextView wrongCount = (TextView) findViewById(R.id.textViewWrongCount);
-            wrongCount.setText(Integer.toString(wrong));
-            wrongCount.setTextSize(20 + wrong * 2);
-            RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
-            ratingBar.setStepSize(24f);
-            double dRight = (double) right;
-            double dWrong = (double) wrong;
-            double rating = (dRight / (dRight + dWrong)) * 6;
-            ratingBar.setRating(((float) rating));
-            ratingBar.setIsIndicator(true);
-            TextView grade = (TextView) findViewById(R.id.textViewGrade);
-            rating = dRight / (dRight + dWrong) * 1000;
-            rating = Math.round(rating) / 10;
-            grade.setText(Double.toString(rating) + " %");
-
-            Bundle bundle = new Bundle();
-            bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Integer.toString(ds.currentLektion+1));
-            bundle.putInt(FirebaseAnalytics.Param.VALUE, (int) rating);
-            firebaseAnalytics.logEvent(ANALYTICS_EVENT_TEST_VOC_RESULT, bundle);
+            showAd();
         }else {
             if(clock){
                 Random rand = new Random();

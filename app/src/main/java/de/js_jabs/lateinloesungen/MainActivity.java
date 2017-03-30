@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String PROVE_INPUT = "proveInput";
     public static final String IGNORE_CASE = "ignoreCase";
     public static final String DEV_MODE = "devMode";
-    public static final String SURVEY_REMOVE_ADS = "surveyRemoveAds";
     public static final String SURVEY_TIMESTAMP = "surveyTimeStamp";
     public static final String DATA_TIMESTAMP = "dataTimeStamp";
     public static final String DATA_FORMS_TIMESTAMP = "dataFormsTimeStamp";
@@ -98,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public CheckBox erwähnenCheckBox;
     public EditText nameEditText;
     public EditText inhaltEditText;
+    public TextView rightsInfoTextView;
     public ViewGroup appBarMain;
     public View contentSend;
     public View contentHome;
@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         spinner.setOnItemSelectedListener(this);
 
         final ListView listview = (ListView) findViewById(R.id.listView);
-        final String[] values = new String[] { "Übersetzungstext, Blauer Kasten und Aufgaben", "Vokabeln abfragen", "Vokabeln anzeigen", "Datenbank aktualisieren", "Bewerten und Weitererzählen nicht vergessen ;D" };
+        final String[] values = new String[] { "Übersetzungstext, Blauer Kasten und Aufgaben", "Vokabeln abfragen", "Vokabeln anzeigen", "Datenbank aktualisieren", "Teilen nicht vergessen :D" };
 
         adapterListView = new StableArrayAdapter(this, values);
         listview.setAdapter(adapterListView);
@@ -273,12 +273,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         firebaseRemoteConfig.fetch(14400);
 
         ds.cursus_surveys = firebaseRemoteConfig.getBoolean("cursus_surveys");
+        ds.cursus_survey_reward_multiplier = (int) firebaseRemoteConfig.getLong("cursus_survey_reward_multiplier");
+        ds.rights_info = firebaseRemoteConfig.getString("cursus_rights_info");
 
         if(ds.devMode){
             ds.cursus_surveys = true;
         }
 
         Log.d("Pollfish", "cursus_surveys: " + ds.cursus_surveys);
+        Log.d("Pollfish", "cursus_survey_reward_multiplier: " + ds.cursus_survey_reward_multiplier);
     }
 
     private void setupPollfish(){
@@ -287,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .pollfishClosedListener(new PollfishClosedListener() {
                         @Override
                         public void onPollfishClosed(){
+                            ds.received_survey = false;
                             if(!PollFish.isPollfishPresent()){
                                 PollFish.initWith(MainActivity.this, PFparamsBuilder);
                                 PollFish.hide();
@@ -312,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 ds.surveyTimeStamp = ds.surveyTimeStamp + 20 * 3600000;
                             }
                             PollFish.hide();
-                            Toast.makeText(MainActivity.this, "Du bist leider nicht teilnahmeberechtigt. Deshalb erhälst du nur 20 Stunden keine werbung. Trotzdem Danke :D", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Du bist leider nicht teilnahmeberechtigt. Deshalb erhälst du nur für 20 Stunden keine werbung. Trotzdem Danke :D", Toast.LENGTH_SHORT).show();
                             sharedEditor.putLong(SURVEY_TIMESTAMP, ds.surveyTimeStamp);
                             sharedEditor.commit();
                             testSurveyTimestamp();
@@ -320,11 +324,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }).pollfishSurveyReceivedListener(new PollfishSurveyReceivedListener() {
                         @Override
                         public void onPollfishSurveyReceived(final boolean playfulSurvey, final int surveyPrice) {
-                            double surveyPriceDC = surveyPrice;
-                            surveyPriceDC = surveyPriceDC / 100;
-
                             Bundle bundle = new Bundle();
-                            bundle.putString(FirebaseAnalytics.Param.VALUE, Double.toString(surveyPriceDC));
+                            bundle.putString(FirebaseAnalytics.Param.VALUE, Double.toString(surveyPrice));
                             bundle.putString(FirebaseAnalytics.Param.CURRENCY, "USD");
                             firebaseAnalytics.logEvent("received_survey", bundle);
 
@@ -335,26 +336,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }).pollfishSurveyCompletedListener(new PollfishSurveyCompletedListener() {
                         @Override
                         public void onPollfishSurveyCompleted(final boolean playfulSurvey, final int surveyPrice) {
-                            double surveyPriceDC = surveyPrice;
-                            surveyPriceDC = surveyPriceDC / 100;
-
                             Bundle bundle = new Bundle();
-                            bundle.putString(FirebaseAnalytics.Param.VALUE, Double.toString(surveyPriceDC));
+                            bundle.putString(FirebaseAnalytics.Param.VALUE, Double.toString(surveyPrice));
                             bundle.putString(FirebaseAnalytics.Param.CURRENCY, "USD");
-                            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.ECOMMERCE_PURCHASE, bundle);
+                            firebaseAnalytics.logEvent("survey_completed", bundle);
 
-                            Log.d("Pollfish", "Survey Completed! Playful: " + playfulSurvey + " / Price: " + surveyPriceDC + " USD");
+                            Log.d("Pollfish", "Survey Completed! Playful: " + playfulSurvey + " / Price: " + surveyPrice + " CENT");
                             ds.received_survey = false;
                             if(ds.surveyTimeStamp < System.currentTimeMillis()){
-                                ds.surveyTimeStamp = System.currentTimeMillis() + (surveyPrice + 20) * 3600000;
+                                ds.surveyTimeStamp =  System.currentTimeMillis() + (surveyPrice*ds.cursus_survey_reward_multiplier) * 3600000;
                             }else {
-                                ds.surveyTimeStamp = ds.surveyTimeStamp + (surveyPrice + 20) * 3600000;
+                                ds.surveyTimeStamp = ds.surveyTimeStamp + (surveyPrice*ds.cursus_survey_reward_multiplier) * 3600000;
                             }
                             sharedEditor.putLong(SURVEY_TIMESTAMP, ds.surveyTimeStamp);
                             sharedEditor.commit();
+                            PollFish.hide();
                             testSurveyTimestamp();
                         }
-                    }).customMode(true).releaseMode(!ds.devMode).build();
+                    }).customMode(false).releaseMode(!ds.devMode).build();
 
             PollFish.initWith(this, PFparamsBuilder);
             PollFish.hide();
@@ -367,9 +366,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showSurveyDialog(int price){
+        int days = (price*ds.cursus_survey_reward_multiplier)/24;
+        int hours = price*ds.cursus_survey_reward_multiplier - days*24;
+
         surveyDialogBuilder = new AlertDialog.Builder(this)
                 .setTitle("Neue Umfrage")
-                .setMessage(Html.fromHtml("Nimm an einer kurzen Umfrage teil und <B>entferne die Werbung</B> für (weitere): <br/><br/><h1>" + (price + 20) + " Stunden</h1><B>Hinweis:</B> Solltest du aufgrund deiner Anworten nicht teilnahmeberechtigt sein wird die Werbung nicht entfernt. Außerdem hast du die Chance einen kleinen <B>Preis</B> zu gewinnen!"))
+                .setMessage(Html.fromHtml("Nimm an einer kurzen Umfrage teil und <B>entferne die Werbung</B> für (weitere): <br/><br/><h1>" + days + " Tage " + hours + " Stunden</h1><B>Hinweis:</B> Vor deiner ersten Umfrage werden einmalig demografische Fragen gestellt. Sollte die Umfrage wegen deiner Angaben nicht mehr zu dir passen wird die Werbung nicht entfernt. Nachdem du die demografischen Fragen einmal beantwortet hast erhälst du nur noch passende Umfragen."))
                 .setPositiveButton("Teilnehmen", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -378,6 +380,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }else {
                             PollFish.initWith(MainActivity.this, PFparamsBuilder);
                         }
+
+                        Bundle bundle = new Bundle();
+                        firebaseAnalytics.logEvent("survey_participation", bundle);
                     }
                 })
                 .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
@@ -385,6 +390,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onClick(DialogInterface dialogInterface, int i) {
                         surveyDialogBuilder.cancel();
                         ds.received_survey = false;
+
+                        Bundle bundle = new Bundle();
+                        firebaseAnalytics.logEvent("survey_canceled", bundle);
                     }
                 })
                 .setCancelable(false)
@@ -408,15 +416,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        if(ds.cursus_surveys){
-            PollFish.initWith(this, PFparamsBuilder);
-            PollFish.hide();
-        }
         if(!isDataLoaded()){
             if(Build.VERSION.SDK_INT >= 11)
                 recreate();
             else
                 finish();
+        }
+        if(ds.cursus_surveys){
+            PollFish.initWith(this, PFparamsBuilder);
+            PollFish.hide();
         }
     }
 
@@ -484,6 +492,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             appBarMain.removeView(contentHome);
             appBarMain.removeView(contentSend);
             appBarMain.addView(contentRightsInfo);
+
+            rightsInfoTextView = (TextView) findViewById(R.id.textViewRightsInfo);
+            ds.rights_info = ds.rights_info.replace("\\n", "\n");
+            rightsInfoTextView.setText(ds.rights_info);
 
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "open rights info UI");
@@ -584,9 +596,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
             try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=de.js_jabs.lateinloesungen")));
-            } catch (android.content.ActivityNotFoundException anfe) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=de.js_jabs.lateinloesungen")));
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                String sAux = "Latein Cursus App\n\nÜbersetzungstexte und Vokabeltrainer für Latein Cursus A\n\nhttp://bit.ly/CursusA-App";
+                i.putExtra(Intent.EXTRA_TEXT, sAux);
+                startActivity(Intent.createChooser(i, "Teilen"));
+            } catch(Exception e) {
+                FirebaseCrash.report(e);
             }
         }
     }
@@ -611,12 +627,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if(devCounter > 20){
                 if(ds.devMode){
                     ds.devMode = false;
-                    sharedEditor.putBoolean(DEV_MODE, ds.devMode);
+                    sharedEditor.putBoolean(DEV_MODE, false);
                     sharedEditor.apply();
                     Toast.makeText(this, "Dev-Modus deaktiviert", Toast.LENGTH_SHORT).show();
                 }else {
                     ds.devMode = true;
-                    sharedEditor.putBoolean(DEV_MODE, ds.devMode);
+                    sharedEditor.putBoolean(DEV_MODE, true);
                     sharedEditor.apply();
                     Toast.makeText(this, "Dev-Modus aktiviert", Toast.LENGTH_SHORT).show();
                 }
@@ -948,9 +964,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 imageViewDatabase.setImageResource(R.drawable.database_icon);
                 return listItemViewDatabase;
             }else{
-                textViewTitle.setTextSize(17f);
                 textViewTitle.setTextColor(Color.parseColor("#2E2E2E"));
-                imageView.setImageResource(R.drawable.like_icon);
+                imageView.setImageResource(R.drawable.share_icon);
             }
 
             return listItemView;

@@ -172,12 +172,6 @@ public class DisplayLektion extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy(){
-        super.onDestroy();
-        Log.d(ds.LOG_TAG, "onDestroy()");
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 

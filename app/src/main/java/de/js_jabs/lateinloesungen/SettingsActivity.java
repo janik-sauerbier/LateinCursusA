@@ -38,7 +38,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         sharedInputEditor = sharedPreferencesInput.edit();
 
         sharedInputEditor.putBoolean(MainActivity.EXTRA_FORMS, sharedPreferencesData.getBoolean(MainActivity.EXTRA_FORMS, false));
-        sharedInputEditor.putBoolean(MainActivity.SURVEY_REMOVE_ADS, sharedPreferencesData.getBoolean(MainActivity.SURVEY_REMOVE_ADS, true));
         doProvePref = (ListPreference) findPreference(MainActivity.PROVE_INPUT);
         doProvePref.setOnPreferenceChangeListener(this);
         ignoreCasePref = (CheckBoxPreference) findPreference(MainActivity.IGNORE_CASE);
@@ -78,7 +77,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public void onStop(){
         super.onStop();
         sharedDataEditor.putBoolean(MainActivity.EXTRA_FORMS, sharedPreferencesInput.getBoolean(MainActivity.EXTRA_FORMS, false));
-        sharedDataEditor.putBoolean(MainActivity.SURVEY_REMOVE_ADS, sharedPreferencesInput.getBoolean(MainActivity.SURVEY_REMOVE_ADS, true));
         if(doProvePref.getValue().equals("1")){
             sharedDataEditor.putBoolean(MainActivity.PROVE_INPUT, false);
             ds.proveInput = false;

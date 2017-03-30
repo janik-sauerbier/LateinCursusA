@@ -46,7 +46,7 @@
         android:paddingTop="4dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Du kannst die Werbung einen kleine Spende entfernen :D"
+        android:text="Du kannst die Werbung in den Optionen entfernen :D"
         android:textColor="@color/colorWhite"
         android:background="@color/colorPrimary"
         android:textSize="12dp"

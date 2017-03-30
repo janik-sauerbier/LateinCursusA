@@ -4,4 +4,12 @@
         <key>cursus_surveys</key>
         <value>false</value>
     </entry>
+    <entry>
+        <key>cursus_rights_info</key>
+        <value>Copyright:\nAufgrund einer Beschwerde wird der offizielle Vertrieb, der App, in Deutschland bis auf Weiteres eingestellt. In anderen Ländern ist die App weiterhin über den Google Play Store erhältlich.\n\nNutzungsbedingungen:\nDas Urheberrecht oder das ausschließliche Nutzungsrecht aller Übersetzungen liegt bei dem App Ersteller. Durch das Einsenden eines Beitrags wird dem App Ersteller von dem Einsender das unbegrenzte und ausschließliche Nutzungsrecht dafür zugesichert. Der Einsender verpflichtet sich dazu der Urheber des Beitrags zu sein. Eine namentliche Erwähnung des Einsenders/Urhebers wird angeboten, aber nicht garantiert.\n\nDatenschutz:\njs-labs.jimdo.com/privacy-policy/</value>
+    </entry>
+    <entry>
+        <key>cursus_survey_reward_multiplier</key>
+        <value>1</value>
+    </entry>
 </defaultsMap>
