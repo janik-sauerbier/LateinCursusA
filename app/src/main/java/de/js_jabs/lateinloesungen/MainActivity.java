@@ -37,6 +37,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.appodeal.ads.Appodeal;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -146,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupFirebase();
 
         setupPollfish();
+
+        setupAppodeal();
 
         checkDatabase();
     }
@@ -324,8 +327,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }).pollfishSurveyReceivedListener(new PollfishSurveyReceivedListener() {
                         @Override
                         public void onPollfishSurveyReceived(final boolean playfulSurvey, final int surveyPrice) {
+                            double DsurveyPrice = surveyPrice;
+                            DsurveyPrice = DsurveyPrice / 100;
+
                             Bundle bundle = new Bundle();
-                            bundle.putString(FirebaseAnalytics.Param.VALUE, Double.toString(surveyPrice));
+                            bundle.putDouble(FirebaseAnalytics.Param.VALUE, DsurveyPrice);
                             bundle.putString(FirebaseAnalytics.Param.CURRENCY, "USD");
                             firebaseAnalytics.logEvent("received_survey", bundle);
 
@@ -336,12 +342,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }).pollfishSurveyCompletedListener(new PollfishSurveyCompletedListener() {
                         @Override
                         public void onPollfishSurveyCompleted(final boolean playfulSurvey, final int surveyPrice) {
+                            double DsurveyPrice = surveyPrice;
+                            DsurveyPrice = DsurveyPrice / 100;
+
                             Bundle bundle = new Bundle();
-                            bundle.putString(FirebaseAnalytics.Param.VALUE, Double.toString(surveyPrice));
+                            bundle.putDouble(FirebaseAnalytics.Param.VALUE, DsurveyPrice);
                             bundle.putString(FirebaseAnalytics.Param.CURRENCY, "USD");
                             firebaseAnalytics.logEvent("survey_completed", bundle);
 
-                            Log.d("Pollfish", "Survey Completed! Playful: " + playfulSurvey + " / Price: " + surveyPrice + " CENT");
+                            Log.d("Pollfish", "Survey Completed! Playful: " + playfulSurvey + " / Price: " + DsurveyPrice + " USD");
                             ds.received_survey = false;
                             if(ds.surveyTimeStamp < System.currentTimeMillis()){
                                 ds.surveyTimeStamp =  System.currentTimeMillis() + (surveyPrice*ds.cursus_survey_reward_multiplier) * 3600000;
@@ -403,13 +412,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void testSurveyTimestamp(){
         if(ds.surveyTimeStamp < System.currentTimeMillis()){
             ds.surveyRemoveAds = false;
-            firebaseAnalytics.setUserProperty(ANALYTICS_SURVEY_REMOVED_ADS, Boolean.toString(ds.surveyRemoveAds));
+            firebaseAnalytics.setUserProperty(ANALYTICS_SURVEY_REMOVED_ADS, Boolean.toString(false));
             surveyTimerFab.setVisibility(View.INVISIBLE);
         } else {
             ds.surveyRemoveAds = true;
-            firebaseAnalytics.setUserProperty(ANALYTICS_SURVEY_REMOVED_ADS, Boolean.toString(ds.surveyRemoveAds));
+            firebaseAnalytics.setUserProperty(ANALYTICS_SURVEY_REMOVED_ADS, Boolean.toString(true));
             surveyTimerFab.setVisibility(View.VISIBLE);
             Snackbar.make(surveyTimerFab, "Werbung für " + ((ds.surveyTimeStamp - System.currentTimeMillis()) / 3600000 + 1) + " Stunden entfernt.", Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private void setupAppodeal() {
+        if(!ds.surveyRemoveAds && !ds.removeAds){
+            Appodeal.disableLocationPermissionCheck();
+            Appodeal.disableWriteExternalStoragePermissionCheck();
+            Appodeal.setTesting(ds.devMode);
+            Appodeal.initialize(this, "260f63a6337ed63fc2aeed562b70c64a792db12db4812a54", Appodeal.BANNER | Appodeal.NATIVE | Appodeal.INTERSTITIAL);
         }
     }
 
@@ -417,12 +435,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         if(!isDataLoaded()){
-            if(Build.VERSION.SDK_INT >= 11)
-                recreate();
-            else
-                finish();
+            recreate();
         }
-        if(ds.cursus_surveys){
+        if(ds.cursus_surveys && PFparamsBuilder != null){
             PollFish.initWith(this, PFparamsBuilder);
             PollFish.hide();
         }
@@ -541,10 +556,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     showSurveyDialog(ds.currentSurveyPrice);
                 }
             }else {
-                if(Build.VERSION.SDK_INT >= 11)
-                    recreate();
-                else
-                    finish();
+                recreate();
             }
         }else if(id == 1){
             if(isDataLoaded()){
@@ -556,10 +568,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     showSurveyDialog(ds.currentSurveyPrice);
                 }
             }else {
-                if(Build.VERSION.SDK_INT >= 11)
-                    recreate();
-                else
-                    finish();
+                recreate();
             }
         }else if(id == 2){
             if(isDataLoaded()){
@@ -576,10 +585,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     showSurveyDialog(ds.currentSurveyPrice);
                 }
             }else {
-                if(Build.VERSION.SDK_INT >= 11)
-                    recreate();
-                else
-                    finish();
+                recreate();
             }
         } else if (id == 3) {
             if(!ds.dataIsLeast){

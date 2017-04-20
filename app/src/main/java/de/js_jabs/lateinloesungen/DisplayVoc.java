@@ -15,21 +15,19 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.appodeal.ads.Appodeal;
+import com.appodeal.ads.InterstitialCallbacks;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.firebase.crash.FirebaseCrash;
 
 public class DisplayVoc extends AppCompatActivity {
     private TableLayout table;
     private TableRow.LayoutParams layoutParamsL;
     private TableRow.LayoutParams layoutParamsD;
-
-    private InterstitialAd mInterstitialAd;
-    private AdView mAdView;
-    private ViewTreeObserver.OnGlobalLayoutListener layoutListener;
-    private RelativeLayout contentDisplayVoc;
 
     private DataStorage ds;
 
@@ -53,7 +51,6 @@ public class DisplayVoc extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT, 6f);
 
         table = (TableLayout) findViewById(R.id.table);
-        contentDisplayVoc = (RelativeLayout) findViewById(R.id.contentDisplayVocRl);
 
         toolbar.setTitle("Lektion " + (ds.currentLektion + 1));
         setSupportActionBar(toolbar);
@@ -70,65 +67,31 @@ public class DisplayVoc extends AppCompatActivity {
             Log.d(ds.LOG_TAG, "Werbung wird nicht angezeigt");
         }else {
             Log.d(ds.LOG_TAG, "Werbung wird angezeigt");
-            mInterstitialAd = new InterstitialAd(this);
 
-            if(ds.devMode){
-                mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-            }else {
-                mInterstitialAd.setAdUnitId("ca-app-pub-2790218770120733/2248668806");
-            }
-
-            mInterstitialAd.setAdListener(new AdListener() {
+            Appodeal.setBannerViewId(R.id.dv_banner);
+            Appodeal.show(this, Appodeal.BANNER_VIEW);
+            Appodeal.setInterstitialCallbacks(new InterstitialCallbacks() {
                 @Override
-                public void onAdClosed() {
-                    closeLektion();
+                public void onInterstitialLoaded(boolean b) {}
+
+                @Override
+                public void onInterstitialFailedToLoad() {
+                    FirebaseCrash.report(new Throwable("DisplayVoc: InterstitialFailedToLoad()"));
+                }
+
+                @Override
+                public void onInterstitialShown() {}
+
+                @Override
+                public void onInterstitialClicked() {}
+
+                @Override
+                public void onInterstitialClosed() {
+                    finish();
                 }
             });
-            requestNewInterstitial();
-
-            mAdView = new AdView(this);
-            mAdView.setAdSize(AdSize.SMART_BANNER);
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-            mAdView.setLayoutParams(layoutParams);
-            if(ds.devMode){
-                mAdView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
-            }else {
-                mAdView.setAdUnitId("ca-app-pub-2790218770120733/5900139201");
-            }
-            contentDisplayVoc.addView(mAdView);
-            AdRequest adRequest = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest);
-            layoutListener = new ViewTreeObserver.OnGlobalLayoutListener(){
-                @Override
-                public void onGlobalLayout() {
-                    int height = mAdView.getHeight();
-                    if (height > 0) {
-                        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                        layoutParams2.topMargin = height;
-                        TableRow titleRow = (TableRow) table.getChildAt(0);
-                        titleRow.setLayoutParams(layoutParams2);
-                        if(Build.VERSION.SDK_INT >= 16)
-                            mAdView.getViewTreeObserver().removeOnGlobalLayoutListener(layoutListener);
-                    }
-                }
-            };
-
-            mAdView.getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
         }
 
-    }
-
-    private void requestNewInterstitial() {
-        AdRequest adRequest = new AdRequest.Builder()
-                .build();
-
-        mInterstitialAd.loadAd(adRequest);
-    }
-
-    public void closeLektion(){
-        finish();
     }
 
     private void addVoc(Vokablel vokablel){
@@ -166,20 +129,13 @@ public class DisplayVoc extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        showAd();
+        if(Appodeal.isLoaded(Appodeal.INTERSTITIAL) && !ds.surveyRemoveAds && !ds.removeAds)
+            Appodeal.show(this, Appodeal.INTERSTITIAL);
+        else
+            finish();
     }
 
-    public void showAd(){
-        if(ds.removeAds || ds.surveyRemoveAds){
-            finish();
-        } else {
-            if (mInterstitialAd.isLoaded()) {
-                mInterstitialAd.show();
-            } else {
-                finish();
-            }
-        }
-    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
