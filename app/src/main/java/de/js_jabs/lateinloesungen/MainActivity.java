@@ -73,6 +73,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Button.OnClickListener, CheckBox.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
+    public static final long VERSION_CODE = 31;
 
     public static final String SHARED_PREF = "privateSharedPreferences";
     public static final String REMOVEADS_ITEM_SKU = "de.js_labs.lateinloesungen.removeads";
@@ -151,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupAppodeal();
 
         checkDatabase();
+
+        checkAppUpdate();
     }
 
     private void setupDataStorage(){
@@ -820,7 +823,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    //                            ONLINE DATABASE
+    //                            ONLINE DATABASE / UPDATES
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     private void checkDatabase(){
@@ -889,7 +892,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
-
                     databaseStatus = "Aktualisieren fehlgeschlagen!";
                     databaseStatusColor = Color.RED;
                     adapterListView.notifyDataSetChanged();
@@ -918,6 +920,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
     }
+
+    private void checkAppUpdate() {
+        if(firebaseRemoteConfig.getLong("cursus_version_code") > VERSION_CODE){
+            Intent i = new Intent(this, UpdateActivity.class);
+            startActivity(i);
+        }
+    }
+
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //                            SPINNER
