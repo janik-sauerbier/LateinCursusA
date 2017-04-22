@@ -12,4 +12,8 @@
         <key>cursus_survey_reward_multiplier</key>
         <value>1</value>
     </entry>
+    <entry>
+        <key>cursus_version_code</key>
+        <value>31</value>
+    </entry>
 </defaultsMap>
