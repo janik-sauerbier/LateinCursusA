@@ -923,6 +923,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void checkAppUpdate() {
         if(firebaseRemoteConfig.getLong("cursus_version_code") > VERSION_CODE){
+            Log.d("test", "test2");
             Intent i = new Intent(this, UpdateActivity.class);
             startActivity(i);
         }
