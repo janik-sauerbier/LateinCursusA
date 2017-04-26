@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FileDownloadTask;
@@ -53,6 +54,7 @@ public class UpdateActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void setupUpdate(){
+        final FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         firebaseStorage = FirebaseStorage.getInstance();
         storageRef = firebaseStorage.getReferenceFromUrl("gs://admob-app-id-6279012805.appspot.com");
         updateRef = storageRef.child("cursus.apk");
@@ -63,6 +65,8 @@ public class UpdateActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onSuccess(StorageMetadata metadata) {
                 updateIsReady = true;
+                Bundle bundle = new Bundle();
+                firebaseAnalytics.logEvent("update_ready", bundle);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

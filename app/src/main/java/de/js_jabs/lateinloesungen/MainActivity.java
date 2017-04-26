@@ -73,7 +73,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Button.OnClickListener, CheckBox.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
-    public static final long VERSION_CODE = 31;
+    public static final long VERSION_CODE = 32;
 
     public static final String SHARED_PREF = "privateSharedPreferences";
     public static final String REMOVEADS_ITEM_SKU = "de.js_labs.lateinloesungen.removeads";
@@ -607,7 +607,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             try {
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("text/plain");
-                String sAux = "Latein Cursus App\n\nÜbersetzungstexte und Vokabeltrainer für Latein Cursus A\n\nhttp://bit.ly/CursusA-App";
+                String sAux = "Latein Cursus App\n\nÜbersetzungstexte und Vokabeltrainer für Latein Cursus A\n\nhttp://rebrand.ly/CursusA-App";
                 i.putExtra(Intent.EXTRA_TEXT, sAux);
                 startActivity(Intent.createChooser(i, "Teilen"));
             } catch(Exception e) {
@@ -923,7 +923,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void checkAppUpdate() {
         if(firebaseRemoteConfig.getLong("cursus_version_code") > VERSION_CODE){
-            Log.d("test", "test2");
+            Bundle bundle = new Bundle();
+            firebaseAnalytics.logEvent("update_received", bundle);
+
             Intent i = new Intent(this, UpdateActivity.class);
             startActivity(i);
         }
