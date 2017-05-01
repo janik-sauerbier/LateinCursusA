@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -73,7 +72,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Button.OnClickListener, CheckBox.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
-    public static final long VERSION_CODE = 32;
 
     public static final String SHARED_PREF = "privateSharedPreferences";
     public static final String REMOVEADS_ITEM_SKU = "de.js_labs.lateinloesungen.removeads";
@@ -152,8 +150,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupAppodeal();
 
         checkDatabase();
-
-        checkAppUpdate();
     }
 
     private void setupDataStorage(){
@@ -918,16 +914,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Log.d(ds.LOG_TAG, "Datenbank wird aktualisiert... (pausiert)");
                 }
             });
-        }
-    }
-
-    private void checkAppUpdate() {
-        if(firebaseRemoteConfig.getLong("cursus_version_code") > VERSION_CODE){
-            Bundle bundle = new Bundle();
-            firebaseAnalytics.logEvent("update_received", bundle);
-
-            Intent i = new Intent(this, UpdateActivity.class);
-            startActivity(i);
         }
     }
 
