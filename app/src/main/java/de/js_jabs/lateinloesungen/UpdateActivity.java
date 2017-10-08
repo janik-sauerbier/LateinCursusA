@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -49,6 +50,9 @@ public class UpdateActivity extends AppCompatActivity implements View.OnClickLis
         installBtn = (Button) findViewById(R.id.buttonInstallUpdate);
         installBtn.setOnClickListener(this);
         infoTextView = (TextView) findViewById(R.id.textViewUpdateInfo);
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
         setupUpdate();
     }
