@@ -427,6 +427,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Appodeal.disableWriteExternalStoragePermissionCheck();
             Appodeal.setTesting(ds.devMode);
             Appodeal.initialize(this, "260f63a6337ed63fc2aeed562b70c64a792db12db4812a54", Appodeal.BANNER | Appodeal.NATIVE | Appodeal.INTERSTITIAL);
+            Appodeal.set728x90Banners(true);
         }
     }
 

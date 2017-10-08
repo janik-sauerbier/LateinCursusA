@@ -2,22 +2,14 @@ package de.js_jabs.lateinloesungen;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,24 +17,17 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appodeal.ads.Appodeal;
-import com.appodeal.ads.AppodealMediaView;
+import com.appodeal.ads.NativeMediaView;
 import com.appodeal.ads.NativeAd;
 import com.appodeal.ads.NativeCallbacks;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.NativeExpressAdView;
-import com.google.android.gms.ads.formats.NativeAdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickListener {
@@ -115,9 +100,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
                 }else if(againSelected == 2){
                     ds.testVocBuffer = tempAllVocWorng;
                 }
-                if(Build.VERSION.SDK_INT >= 11) {
-                    recreate();
-                }
+                recreate();
             }
         });
         alertBuilder.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
@@ -172,11 +155,11 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
             Appodeal.show(this, Appodeal.BANNER_VIEW);
             Appodeal.setAutoCacheNativeMedia(true);
             Appodeal.setAutoCacheNativeIcons(true);
-            Appodeal.cache(this, Appodeal.NATIVE);
             Appodeal.setNativeCallbacks(new NativeCallbacks() {
+
                 @Override
-                public void onNativeLoaded(List<NativeAd> list) {
-                    nativeAd = list.get(0);
+                public void onNativeLoaded() {
+                    nativeAd = Appodeal.getNativeAds(1).get(0);
                 }
 
                 @Override
@@ -210,23 +193,28 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
             RatingBar adRating = (RatingBar) findViewById(R.id.ratingBarAd);
             TextView adRatingText = (TextView) findViewById(R.id.textViewRatingAd);
             TextView adDescription = (TextView) findViewById(R.id.textViewDescriptionAd);
-            AppodealMediaView appodealMediaView = (AppodealMediaView) findViewById(R.id.appodealMediaView);
+            NativeMediaView appodealMediaView = (NativeMediaView) findViewById(R.id.appodealMediaView);
             View providerView = nativeAd.getProviderView(this);
 
             adTitle.setText(nativeAd.getTitle());
             adLogo.setImageBitmap(nativeAd.getIcon());
             adBtn.setText(nativeAd.getCallToAction());
-            adRating.setMax(5);
-            adRating.setStepSize(0.1f);
-            adRating.setRating(nativeAd.getRating());
-            BigDecimal roundfinalPrice = new BigDecimal(nativeAd.getRating()).setScale(1, BigDecimal.ROUND_HALF_UP);
-            adRatingText.setText(roundfinalPrice.toString());
+            if (nativeAd.getRating() == 0) {
+                adRating.setVisibility(View.GONE);
+                adRatingText.setVisibility(View.GONE);
+            } else {
+                adRating.setMax(5);
+                adRating.setStepSize(0.1f);
+                adRating.setRating(nativeAd.getRating());
+                BigDecimal roundfinalPrice = new BigDecimal(nativeAd.getRating()).setScale(1, BigDecimal.ROUND_HALF_UP);
+                adRatingText.setText(roundfinalPrice.toString());
+            }
             adDescription.setText(nativeAd.getDescription());
             if (providerView != null) {
                 RelativeLayout providerViewContainer = (RelativeLayout) findViewById(R.id.providerViewContainer);
                 providerViewContainer.addView(providerView);
             }
-            nativeAd.setAppodealMediaView(appodealMediaView);
+            nativeAd.setNativeMediaView(appodealMediaView);
 
             RelativeLayout adContainer = (RelativeLayout) findViewById(R.id.adContainerRl);
             nativeAd.registerViewForInteraction(adContainer);
