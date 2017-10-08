@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
         applicationId "de.js_jabs.lateinloesungen"
         minSdkVersion 14
-        targetSdkVersion 25
-        versionCode 32
-        versionName "1.3.1"
+        targetSdkVersion 26
+        versionCode 33
+        versionName "1.3.2"
         multiDexEnabled true
     }
     buildTypes {
@@ -29,18 +29,28 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':cheetah-mobile-3.4.7')
-    compile project(':pollfish-googleplay-4.3.1')
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.google.android.gms:play-services-ads:10.2.4'
-    compile 'com.google.android.gms:play-services-location:10.2.4'
-    compile 'com.google.firebase:firebase-core:10.2.1'
-    compile 'com.google.firebase:firebase-storage:10.2.1'
-    compile 'com.google.firebase:firebase-crash:10.2.1'
-    compile 'com.google.firebase:firebase-config:10.2.1'
+    compile project(':pollfish-googleplay-4.3.3')
+    compile project(':adcolony-sdk-3.1.2')
+    compile project(':mmedia-6.4.0')
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+
+    compile 'com.google.android.gms:play-services-ads:11.4.2'
+    compile 'com.google.android.gms:play-services-location:11.4.2'
+
+    compile 'com.google.firebase:firebase-core:11.4.2'
+    compile 'com.google.firebase:firebase-storage:11.4.2'
+    compile 'com.google.firebase:firebase-crash:11.4.2'
+    compile 'com.google.firebase:firebase-config:11.4.2'
+    compile 'com.google.firebase:firebase-perf:11.4.2'
+
     compile 'com.android.support:multidex:1.0.1'
+
     testCompile 'junit:junit:4.12'
 }
 
 
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.firebase-perf'

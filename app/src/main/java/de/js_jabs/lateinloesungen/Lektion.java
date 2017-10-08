@@ -21,7 +21,7 @@ public class Lektion {
         boolean selector = true;
         int counter = 0;
         for(String voc : allVoc){
-            if (selector == true){
+            if (selector){
                 selector = false;
             }else {
                 selector = true;
@@ -36,7 +36,7 @@ public class Lektion {
         counter = 0;
         if(vokablels.length > 0){
             for(int i = 0; i < allVoc.length; i++){
-                if (selector == true){
+                if (selector){
                     vokablels[counter].latein = allVoc[i];
                     selector = false;
                 }else {
