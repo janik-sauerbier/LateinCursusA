@@ -155,10 +155,13 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
             Appodeal.show(this, Appodeal.BANNER_VIEW);
             Appodeal.setAutoCacheNativeMedia(true);
             Appodeal.setAutoCacheNativeIcons(true);
+            if(Appodeal.getNativeAds(1).size() != 0)
+                nativeAd = Appodeal.getNativeAds(1).get(0);
             Appodeal.setNativeCallbacks(new NativeCallbacks() {
 
                 @Override
                 public void onNativeLoaded() {
+                    Log.d(ds.LOG_TAG, "onNativeLoaded");
                     nativeAd = Appodeal.getNativeAds(1).get(0);
                 }
 
