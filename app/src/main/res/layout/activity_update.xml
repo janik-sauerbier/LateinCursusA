@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="de.js_jabs.lateinloesungen.UpdateActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/buttonInstallUpdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Installieren"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorWhite"
+        android:padding="16dp"
+        android:layout_margin="25dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/buttonInstallUpdate">
+
+        <TextView
+            android:id="@+id/textViewUpdateInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lädt ..."
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:padding="16dp"/>
+    </ScrollView>
+</RelativeLayout>
