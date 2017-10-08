@@ -72,7 +72,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Button.OnClickListener, CheckBox.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
-    public static final long VERSION_CODE = 33;
+    public static final long VERSION_CODE = 34;
 
     public static final String SHARED_PREF = "privateSharedPreferences";
     public static final String REMOVEADS_ITEM_SKU = "de.js_labs.lateinloesungen.removeads";
