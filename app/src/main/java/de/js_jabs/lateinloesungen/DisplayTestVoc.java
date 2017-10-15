@@ -13,24 +13,17 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.InterstitialCallbacks;
-import com.appodeal.ads.NativeMediaView;
 import com.appodeal.ads.NativeAd;
-import com.appodeal.ads.NativeCallbacks;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickListener {
@@ -163,7 +156,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
                 @Override
                 public void onInterstitialFailedToLoad() {
-                    FirebaseCrash.report(new Throwable("DisplayVoc: InterstitialFailedToLoad()"));
+                    FirebaseCrash.report(new Throwable("DisplayTestVoc: InterstitialFailedToLoad()"));
                 }
 
                 @Override
