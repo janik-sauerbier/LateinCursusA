@@ -20,14 +20,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appodeal.ads.Appodeal;
+import com.appodeal.ads.InterstitialCallbacks;
 import com.appodeal.ads.NativeMediaView;
 import com.appodeal.ads.NativeAd;
 import com.appodeal.ads.NativeCallbacks;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickListener {
@@ -153,10 +156,38 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
             Appodeal.setBannerViewId(R.id.tv_banner);
             Appodeal.show(this, Appodeal.BANNER_VIEW);
-            Appodeal.setAutoCacheNativeMedia(true);
+
+            Appodeal.setInterstitialCallbacks(new InterstitialCallbacks() {
+                @Override
+                public void onInterstitialLoaded(boolean b) {}
+
+                @Override
+                public void onInterstitialFailedToLoad() {
+                    FirebaseCrash.report(new Throwable("DisplayVoc: InterstitialFailedToLoad()"));
+                }
+
+                @Override
+                public void onInterstitialShown() {}
+
+                @Override
+                public void onInterstitialClicked() {}
+
+                @Override
+                public void onInterstitialClosed() {
+                    showResults();
+                }
+            });
+
+            /*Appodeal.setAutoCacheNativeMedia(true);
             Appodeal.setAutoCacheNativeIcons(true);
-            if(Appodeal.getNativeAds(1).size() != 0)
-                nativeAd = Appodeal.getNativeAds(1).get(0);
+            try{
+                if(Appodeal.getNativeAds(1).size() > 0){
+                    nativeAd = Appodeal.getNativeAds(1).get(0);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+                FirebaseCrash.report(e);
+            }
             Appodeal.setNativeCallbacks(new NativeCallbacks() {
 
                 @Override
@@ -173,15 +204,16 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
                 @Override
                 public void onNativeClicked(NativeAd nativeAd) {}
-            });
+            });*/
         }
     }
 
     public void showAd(){
-        if(ds.removeAds || ds.surveyRemoveAds || nativeAd == null){
+        if(ds.removeAds || ds.surveyRemoveAds || !Appodeal.isLoaded(Appodeal.INTERSTITIAL)){
             showResults();
         } else {
-            setContentView(R.layout.activity_display_test_voc_nativ_ad);
+            Appodeal.show(this, Appodeal.INTERSTITIAL);
+            /*setContentView(R.layout.activity_display_test_voc_nativ_ad);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             toolbar.setTitle("Lektion " + (ds.currentLektion + 1));
             setSupportActionBar(toolbar);
@@ -220,7 +252,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
             nativeAd.setNativeMediaView(appodealMediaView);
 
             RelativeLayout adContainer = (RelativeLayout) findViewById(R.id.adContainerRl);
-            nativeAd.registerViewForInteraction(adContainer);
+            nativeAd.registerViewForInteraction(adContainer);*/
         }
     }
 
