@@ -69,7 +69,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
         }else {
             setContentView(R.layout.activity_display_test_voc_notprove);
         }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Lektion " + (ds.currentLektion + 1));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -114,11 +114,11 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
         if(ds.proveInput){
 
-            latein = (TextView) findViewById(R.id.textViewTestVocLateinP);
-            deutsch = (TextView) findViewById(R.id.textViewTestVocDeutschP);
-            justRightBtn = (Button) findViewById(R.id.buttonTestVocJustRight);
-            proveBtn = (Button) findViewById(R.id.buttonTestVocProve);
-            input = (EditText) findViewById(R.id.editTextTestVocInput);
+            latein = findViewById(R.id.textViewTestVocLateinP);
+            deutsch = findViewById(R.id.textViewTestVocDeutschP);
+            justRightBtn = findViewById(R.id.buttonTestVocJustRight);
+            proveBtn = findViewById(R.id.buttonTestVocProve);
+            input = findViewById(R.id.editTextTestVocInput);
 
             justRightBtn.setOnClickListener(this);
             proveBtn.setOnClickListener(this);
@@ -127,10 +127,10 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
             initProveTest(true);
         }else{
-            latein = (TextView) findViewById(R.id.textViewTestVocLateinNP);
-            deutsch = (TextView) findViewById(R.id.textViewTestVocDeutschNP);
-            rightBtn = (Button) findViewById(R.id.buttonTestVocRight);
-            wrongBtn = (Button) findViewById(R.id.buttonTestVocWrong);
+            latein = findViewById(R.id.textViewTestVocLateinNP);
+            deutsch = findViewById(R.id.textViewTestVocDeutschNP);
+            rightBtn = findViewById(R.id.buttonTestVocRight);
+            wrongBtn = findViewById(R.id.buttonTestVocWrong);
 
             rightBtn.setOnClickListener(this);
             wrongBtn.setOnClickListener(this);
@@ -250,7 +250,9 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onResume() {
+        super.onResume();
+        Appodeal.onResume(this, Appodeal.BANNER);
     }
 
     @Override
@@ -277,29 +279,29 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
         }
         setContentView(R.layout.activity_display_test_voc_result);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Ergebnis");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        exit = (Button) findViewById(R.id.buttonTestVocExit);
+        exit = findViewById(R.id.buttonTestVocExit);
         exit.setOnClickListener(this);
-        again = (Button) findViewById(R.id.buttonTestVocAgain);
+        again = findViewById(R.id.buttonTestVocAgain);
         again.setOnClickListener(this);
-        TextView rightCount = (TextView) findViewById(R.id.textViewRightCount);
+        TextView rightCount = findViewById(R.id.textViewRightCount);
         rightCount.setText(Integer.toString(right));
         rightCount.setTextSize(20 + right * 2);
-        TextView wrongCount = (TextView) findViewById(R.id.textViewWrongCount);
+        TextView wrongCount = findViewById(R.id.textViewWrongCount);
         wrongCount.setText(Integer.toString(wrong));
         wrongCount.setTextSize(20 + wrong * 2);
-        RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
+        RatingBar ratingBar = findViewById(R.id.ratingBar);
         ratingBar.setStepSize(24f);
         double dRight = (double) right;
         double dWrong = (double) wrong;
         double rating = (dRight / (dRight + dWrong)) * 6;
         ratingBar.setRating(((float) rating));
         ratingBar.setIsIndicator(true);
-        TextView grade = (TextView) findViewById(R.id.textViewGrade);
+        TextView grade = findViewById(R.id.textViewGrade);
         rating = dRight / (dRight + dWrong) * 1000;
         rating = Math.round(rating) / 10;
         grade.setText(Double.toString(rating) + " %");
@@ -311,7 +313,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
     }
 
     private void initNotProveTest(boolean clock){
-        if(ds.testVocBuffer.size() == 0 && clock == true){
+        if(ds.testVocBuffer.size() == 0 && clock){
             showAd();
         }else {
             if(clock){
@@ -334,7 +336,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
     }
 
     private void initProveTest(boolean clock){
-        if(ds.testVocBuffer.size() == 0 && clock == true){
+        if(ds.testVocBuffer.size() == 0 && clock){
             showAd();
         }else {
             if(clock){
@@ -416,7 +418,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
                 initNotProveTest(clock);
                 clock = false;
             }else {
-                initNotProveTest(clock);
+                initNotProveTest(false);
                 clock = true;
             }
         } else if (v == wrongBtn) {
@@ -425,10 +427,10 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
                 tempAllVocWorng.add(currentVoc);
             }
             if(clock){
-                initNotProveTest(clock);
+                initNotProveTest(true);
                 clock = false;
             }else {
-                initNotProveTest(clock);
+                initNotProveTest(false);
                 clock = true;
             }
         }else if(v == justRightBtn){
@@ -447,7 +449,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
                 initProveTest(clock);
                 clock = false;
             }else {
-                initProveTest(clock);
+                initProveTest(false);
                 clock = true;
             }
         }else if(v == exit){

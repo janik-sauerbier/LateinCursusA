@@ -1,16 +1,12 @@
 package de.js_jabs.lateinloesungen;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -18,11 +14,6 @@ import android.widget.TextView;
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.InterstitialCallbacks;
 import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 
 public class DisplayVoc extends AppCompatActivity {
     private TableLayout table;
@@ -35,7 +26,7 @@ public class DisplayVoc extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_voc);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
         ds = DataStorage.getInstance();
         if(ds.firstStart){
@@ -50,7 +41,7 @@ public class DisplayVoc extends AppCompatActivity {
                 0,
                 ViewGroup.LayoutParams.MATCH_PARENT, 6f);
 
-        table = (TableLayout) findViewById(R.id.table);
+        table = findViewById(R.id.table);
 
         toolbar.setTitle("Lektion " + (ds.currentLektion + 1));
         setSupportActionBar(toolbar);
@@ -135,10 +126,10 @@ public class DisplayVoc extends AppCompatActivity {
             finish();
     }
 
-
-
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onResume() {
+        super.onResume();
+        Appodeal.onResume(this, Appodeal.BANNER);
     }
 
 }

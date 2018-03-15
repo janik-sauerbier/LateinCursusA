@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Home");
 
         setupDataStorage();
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ds.devMode = sharedPreferences.getBoolean(DEV_MODE, false);
         ds.surveyTimeStamp = sharedPreferences.getLong(SURVEY_TIMESTAMP, 0);
 
-        ds.testVocBuffer = new ArrayList<Vokablel>();
+        ds.testVocBuffer = new ArrayList<>();
         for(int i = 1; i < 51; i++){
             ds.lektions[i - 1] = new Lektion(i);
         }
@@ -182,13 +182,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupNavigation(){
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        appBarMain = (ViewGroup) findViewById(R.id.appBarMainRl);
+        appBarMain = findViewById(R.id.appBarMainRl);
         contentSend = inflater.inflate(R.layout.content_send_main, (ViewGroup) findViewById(R.id.contentSendRl));
         contentHome = inflater.inflate(R.layout.content_home_main, (ViewGroup) findViewById(R.id.contentHomeRl));
         contentRightsInfo = inflater.inflate(R.layout.content_rightsinfo_main, (ViewGroup) findViewById(R.id.contentRightsInfoRl));
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupHomeMenu(){
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        Spinner spinner = findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.letionen, R.layout.spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         spinner.setSelection(ds.currentLektion);
         spinner.setOnItemSelectedListener(this);
 
-        final ListView listview = (ListView) findViewById(R.id.listView);
+        final ListView listview = findViewById(R.id.listView);
         final String[] values = new String[] { "Übersetzungstext, Blauer Kasten und Aufgaben", "Vokabeln abfragen", "Vokabeln anzeigen", "Datenbank aktualisieren", "Teilen nicht vergessen :D" };
 
         adapterListView = new StableArrayAdapter(this, values);
@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        surveyTimerFab = (FloatingActionButton) findViewById(R.id.fab_survey_timer);
+        surveyTimerFab = findViewById(R.id.fab_survey_timer);
         surveyTimerFab.setOnClickListener(this);
     }
 
@@ -426,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Appodeal.disableLocationPermissionCheck();
             Appodeal.disableWriteExternalStoragePermissionCheck();
             Appodeal.setTesting(ds.devMode);
-            Appodeal.initialize(this, "260f63a6337ed63fc2aeed562b70c64a792db12db4812a54", Appodeal.BANNER | Appodeal.NATIVE | Appodeal.INTERSTITIAL);
+            Appodeal.initialize(this, "260f63a6337ed63fc2aeed562b70c64a792db12db4812a54", Appodeal.BANNER | /*Appodeal.NATIVE |*/ Appodeal.INTERSTITIAL);
             Appodeal.set728x90Banners(true);
         }
     }
@@ -441,11 +441,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             PollFish.initWith(this, PFparamsBuilder);
             PollFish.hide();
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle bundle){
-
     }
 
     @Override
@@ -484,11 +479,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
             contentSend.setMinimumWidth(displaymetrics.widthPixels);
             contentSend.setMinimumHeight(displaymetrics.heightPixels);
-            sendEntryButton = (Button) findViewById(R.id.buttonSendEntry);
-            nutzungsbedingungenCheckBox = (CheckBox) findViewById(R.id.checkBoxNutzungsbedingungen);
-            erwähnenCheckBox = (CheckBox) findViewById(R.id.checkBoxNameErwähnen);
-            nameEditText = (EditText) findViewById(R.id.editTextAbsenderName);
-            inhaltEditText = (EditText) findViewById(R.id.editTextInhalt);
+            sendEntryButton = findViewById(R.id.buttonSendEntry);
+            nutzungsbedingungenCheckBox = findViewById(R.id.checkBoxNutzungsbedingungen);
+            erwähnenCheckBox = findViewById(R.id.checkBoxNameErwähnen);
+            nameEditText = findViewById(R.id.editTextAbsenderName);
+            inhaltEditText = findViewById(R.id.editTextInhalt);
             sendEntryButton.setOnClickListener(this);
             nutzungsbedingungenCheckBox.setOnCheckedChangeListener(this);
             erwähnenCheckBox.setOnCheckedChangeListener(this);
@@ -535,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             startActivity(i);
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -743,7 +738,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadDataFromStream(InputStream fis){
-        ArrayList<String> data = new ArrayList<String>();
+        ArrayList<String> data = new ArrayList<>();
         String dataPart = null;
         boolean doText = false;
         try {
@@ -793,7 +788,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (eventType == XmlPullParser.START_TAG) {
             } else if (eventType == XmlPullParser.END_TAG) {
             } else if(eventType == XmlPullParser.TEXT) {
-                if(doText == true){
+                if(doText){
                     data.add(xpp.getText());
                     doText = false;
                 }else{
@@ -949,8 +944,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View listItemView = inflater.inflate(R.layout.listview_item, parent, false);
-            TextView textViewTitle = (TextView) listItemView.findViewById(R.id.listViewTitle);
-            ImageView imageView = (ImageView) listItemView.findViewById(R.id.icon);
+            TextView textViewTitle = listItemView.findViewById(R.id.listViewTitle);
+            ImageView imageView = listItemView.findViewById(R.id.icon);
             textViewTitle.setText(values[position]);
             String s = values[position];
             if (s.equals("Übersetzungstext, Blauer Kasten und Aufgaben")) {
@@ -961,9 +956,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 imageView.setImageResource(R.drawable.show_voc_icon);
             }else if(s.equals("Datenbank aktualisieren")){
                 View listItemViewDatabase = inflater.inflate(R.layout.listview_item_database, parent, false);
-                ImageView imageViewDatabase = (ImageView) listItemViewDatabase.findViewById(R.id.icon);
-                TextView textViewTitleDatabase = (TextView) listItemViewDatabase.findViewById(R.id.listViewTitle);
-                TextView databaseStatusTextView = (TextView) listItemViewDatabase.findViewById(R.id.listViewSubTitle);
+                ImageView imageViewDatabase = listItemViewDatabase.findViewById(R.id.icon);
+                TextView textViewTitleDatabase = listItemViewDatabase.findViewById(R.id.listViewTitle);
+                TextView databaseStatusTextView = listItemViewDatabase.findViewById(R.id.listViewSubTitle);
                 databaseStatusTextView.setTextColor(databaseStatusColor);
                 databaseStatusTextView.setText(databaseStatus);
                 textViewTitleDatabase.setText(values[position]);
