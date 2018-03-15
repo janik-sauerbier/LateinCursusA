@@ -23,12 +23,12 @@ import android.widget.Toast;
 
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.InterstitialCallbacks;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.firebase.crash.FirebaseCrash;
 
 public class DisplayLektion extends AppCompatActivity {
 
@@ -71,7 +71,7 @@ public class DisplayLektion extends AppCompatActivity {
 
                 @Override
                 public void onInterstitialFailedToLoad() {
-                    FirebaseCrash.report(new Throwable("DisplayLektion: InterstitialFailedToLoad()"));
+                    Crashlytics.logException(new Throwable("DisplayLektion: InterstitialFailedToLoad()"));
                 }
 
                 @Override
@@ -100,7 +100,7 @@ public class DisplayLektion extends AppCompatActivity {
                     i.putExtra(Intent.EXTRA_TEXT, text);
                     startActivity(Intent.createChooser(i, "Text teilen über..."));
                 } catch(Exception e) {
-                    FirebaseCrash.report(e);
+                    Crashlytics.logException(e);
                 }
             }
         });

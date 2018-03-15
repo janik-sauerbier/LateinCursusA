@@ -17,12 +17,12 @@ import android.widget.TextView;
 
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.InterstitialCallbacks;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.firebase.crash.FirebaseCrash;
 
 public class DisplayVoc extends AppCompatActivity {
     private TableLayout table;
@@ -76,7 +76,7 @@ public class DisplayVoc extends AppCompatActivity {
 
                 @Override
                 public void onInterstitialFailedToLoad() {
-                    FirebaseCrash.report(new Throwable("DisplayVoc: InterstitialFailedToLoad()"));
+                    Crashlytics.logException(new Throwable("DisplayVoc: InterstitialFailedToLoad()"));
                 }
 
                 @Override

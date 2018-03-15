@@ -19,8 +19,8 @@ import android.widget.TextView;
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.InterstitialCallbacks;
 import com.appodeal.ads.NativeAd;
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -156,7 +156,7 @@ public class DisplayTestVoc extends AppCompatActivity implements Button.OnClickL
 
                 @Override
                 public void onInterstitialFailedToLoad() {
-                    FirebaseCrash.report(new Throwable("DisplayTestVoc: InterstitialFailedToLoad()"));
+                    Crashlytics.logException(new Throwable("DisplayTestVoc: InterstitialFailedToLoad()"));
                 }
 
                 @Override

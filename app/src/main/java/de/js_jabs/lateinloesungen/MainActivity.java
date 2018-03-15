@@ -37,10 +37,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appodeal.ads.Appodeal;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -608,7 +608,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 i.putExtra(Intent.EXTRA_TEXT, sAux);
                 startActivity(Intent.createChooser(i, "Teilen"));
             } catch(Exception e) {
-                FirebaseCrash.report(e);
+                Crashlytics.logException(e);
             }
         }
     }
@@ -717,7 +717,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 FileInputStream fis = new FileInputStream(dataFile);
                 loadDataFromStream(fis);
             }catch (IOException e) {
-                FirebaseCrash.report(e);
+                Crashlytics.logException(e);
                 dataFile.delete();
 
                 System.exit(0);
@@ -737,7 +737,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             loadDataFromStream(fis);
         } catch (IOException e) {
-            FirebaseCrash.report(e);
+            Crashlytics.logException(e);
             e.printStackTrace();
         }
     }
@@ -754,17 +754,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             isr.close();
             fis.close();
         } catch (FileNotFoundException e3) {
-            FirebaseCrash.report(e3);
+            Crashlytics.logException(e3);
             e3.printStackTrace();
         } catch (IOException e) {
-            FirebaseCrash.report(e);
+            Crashlytics.logException(e);
             e.printStackTrace();
         }
         XmlPullParserFactory factory = null;
         try {
             factory = XmlPullParserFactory.newInstance();
         } catch (XmlPullParserException e2) {
-            FirebaseCrash.report(e2);
+            Crashlytics.logException(e2);
             e2.printStackTrace();
         }
         factory.setNamespaceAware(true);
@@ -772,20 +772,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try {
             xpp = factory.newPullParser();
         } catch (XmlPullParserException e2) {
-            FirebaseCrash.report(e2);
+            Crashlytics.logException(e2);
             e2.printStackTrace();
         }
         try {
             xpp.setInput(new StringReader(dataPart));
         } catch (XmlPullParserException e1) {
-            FirebaseCrash.report(e1);
+            Crashlytics.logException(e1);
             e1.printStackTrace();
         }
         int eventType = 0;
         try {
             eventType = xpp.getEventType();
         } catch (XmlPullParserException e1) {
-            FirebaseCrash.report(e1);
+            Crashlytics.logException(e1);
             e1.printStackTrace();
         }
         while (eventType != XmlPullParser.END_DOCUMENT){
@@ -803,10 +803,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             try {
                 eventType = xpp.next();
             } catch (XmlPullParserException e) {
-                FirebaseCrash.report(e);
+                Crashlytics.logException(e);
                 e.printStackTrace();
             } catch (IOException e) {
-                FirebaseCrash.report(e);
+                Crashlytics.logException(e);
                 e.printStackTrace();
             }
         }
@@ -852,7 +852,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     databaseStatusColor = Color.GRAY;
                     databaseStatus = "Status konnte nicht geladen werden!";
                     adapterListView.notifyDataSetChanged();
-                    FirebaseCrash.report(exception);
+                    Crashlytics.logException(exception);
                 }
             }
         });
@@ -892,7 +892,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     databaseStatus = "Aktualisieren fehlgeschlagen!";
                     databaseStatusColor = Color.RED;
                     adapterListView.notifyDataSetChanged();
-                    FirebaseCrash.report(exception);
+                    Crashlytics.logException(exception);
                 }
             }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
