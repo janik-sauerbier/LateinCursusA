@@ -421,12 +421,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private boolean isPollfishPresent(){
+        if(ds.cursus_surveys)
+            return false;
+        else if(PollFish.isPollfishPresent())
+            return true;
+        else
+            return false;
+    }
+
     private void setupAppodeal() {
         if(!ds.surveyRemoveAds && !ds.removeAds){
             Appodeal.disableLocationPermissionCheck();
             Appodeal.disableWriteExternalStoragePermissionCheck();
+            Appodeal.disableNetwork(this, "appnext");
+            Appodeal.disableNetwork(this, "avocarrot");
+            Appodeal.disableNetwork(this, "ironsource");
+            Appodeal.disableNetwork(this, "mailru");
+            Appodeal.disableNetwork(this, "tapjoy");
+            Appodeal.disableNetwork(this, "vungle");
+            Appodeal.disableNetwork(this, "yandex");
             Appodeal.setTesting(ds.devMode);
-            Appodeal.initialize(this, "260f63a6337ed63fc2aeed562b70c64a792db12db4812a54", Appodeal.BANNER | /*Appodeal.NATIVE |*/ Appodeal.INTERSTITIAL);
+            Appodeal.initialize(this, "260f63a6337ed63fc2aeed562b70c64a792db12db4812a54", Appodeal.BANNER |  Appodeal.INTERSTITIAL);
             Appodeal.set728x90Banners(true);
         }
     }
@@ -445,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -538,7 +554,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void listViewAction(int id){
         if(id == 0){
             if(isDataLoaded()){
-                if(!PollFish.isPollfishPresent() || !ds.received_survey || ds.removeAds){
+                if(!isPollfishPresent() || !ds.received_survey || ds.removeAds){
                     Intent i = new Intent(this, DisplayLektion.class);
 
                     Bundle bundle = new Bundle();
@@ -555,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }else if(id == 1){
             if(isDataLoaded()){
-                if(!PollFish.isPollfishPresent() || !ds.received_survey || ds.removeAds){
+                if(!isPollfishPresent() || !ds.received_survey || ds.removeAds){
                     loadVocToDialog();
                     AlertDialog dialog = alertBuilder.create();
                     dialog.show();
@@ -567,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }else if(id == 2){
             if(isDataLoaded()){
-                if(!PollFish.isPollfishPresent() || !ds.received_survey || ds.removeAds){
+                if(!isPollfishPresent() || !ds.received_survey || ds.removeAds){
                     Intent i = new Intent(this, DisplayVoc.class);
 
                     Bundle bundle = new Bundle();
